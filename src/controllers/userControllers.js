@@ -76,7 +76,7 @@ const forgetPassword = async (req, res) => {
       subject: "Forgot password confirmation",
       text: `Hello!
           You are receiving this email because we received a password reset request for your account.`,
-      html: `<a href="/${process.env.APP_URL}${process.env.PORT}/resetPassword/${token}">Reset Password</a>`,
+      html: `<a href="/${process.env.APP_URL}${process.env.PORT}/api/citrone/resetPassword/${token}">Reset Password</a>`,
     };
 
     mail(data);
