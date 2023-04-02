@@ -3,14 +3,12 @@ const {
   createAccount,
   getUserAccount,
   forgetPassword,
-  resetPassword,
 } = require("../src/controllers/userControllers");
 
 const router = express.Router();
 
 //forget password and reset password
-router.get("/forget-password", forgetPassword);
-router.post("reset-password/:token", resetPassword);
+router.post("/forget-password", forgetPassword);
 
 //get a user profile endpoint
 router.get("/:id", getUserAccount);

@@ -74,9 +74,18 @@ const forgetPassword = async (req, res) => {
     const data = {
       to: email,
       subject: "Forgot password confirmation",
-      text: `Hello!
-          You are receiving this email because we received a password reset request for your account.`,
-      html: `<a href="${process.env.APP_URL}${process.env.PORT}/api/citrone/resetPassword/${token}">Reset Password</a>`,
+      text: `Hello! 
+          You are receiving this email because we received a password reset request for your account.\n\n
+          <a href="${process.env.APP_URL}${process.env.PORT}/api/citrone/resetPassword/${token}">Reset Password</a> \n\n
+          This password reset link will expire in 60 minutes.
+          If you did not request a password reset, no further action is required.
+          `,
+      html: `Hello!
+      You are receiving this email because we received a password reset request for your account.\n\n
+      <a href="${process.env.APP_URL}${process.env.PORT}/api/citrone/resetPassword/${token}">Reset Password</a> \n\n
+      This password reset link will expire in 60 minutes.
+      If you did not request a password reset, no further action is required.
+      `,
     };
 
     mail(data);
@@ -92,7 +101,45 @@ const forgetPassword = async (req, res) => {
   return;
 };
 
-const resetPassword = async (req, res) => {};
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const hashToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  try {
+    const user = await User.findOne({
+      passwordResetToken: hashToken,
+      forgetPasswordExpires: { $gte: Date() },
+    });
+
+    //if the user returns null
+    if (!user) {
+      res.status(408).send("Token has expired. Try again later");
+      return;
+    }
+    const { password, confirmPassword } = req.body;
+
+    // check if password is undefined
+    if (!password) {
+      res.status(400).send("Password must be provided");
+      return;
+    }
+
+    //check if the password matches with confirm password
+    if (password !== confirmPassword) {
+      res.status(403).send("Password does not match");
+      return;
+    }
+
+    user.forgetPasswordExpires = undefined;
+    user.passwordResetToken = undefined;
+    await user.save();
+
+    res.status(200).send({ message: "Password has been successfully reset" });
+  } catch (error) {
+    throw new Error(error);
+  }
+  return;
+};
 
 module.exports = {
   createAccount,
