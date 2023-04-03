@@ -17,7 +17,6 @@ app.use(logger("dev")); //logger to log every request and response summary
 app.use(express.urlencoded({ extended: true }));
 
 //Routes
-// app.use("/api/citrone", authRoutes);
 app.post("/api/citrone/resetPassword/:token", resetPassword);
 app.use("/api/citrone/user", userRouter);
 
