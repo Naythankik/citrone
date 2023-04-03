@@ -3,7 +3,7 @@ mongoose.set("strictQuery", true);
 
 const connection = async () => {
   try {
-    await mongoose.connect(process.env.DB_PORT);
+    await mongoose.connect(process.env.DB_URL);
     console.log("Database is running");
   } catch (error) {
     throw new Error(error);
