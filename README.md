@@ -7,7 +7,6 @@
 - Default routes : GET [/](/),[/api/citrone/](/api/citrone/),[/*](/*)
 
 #### User Routes
-<font color='red'>test blue color font</font>
 
 - Default user route : GET : [/api/citrone/user](/api/citrone/user)
 - Create a user : POST :  [/api/citrone/user](/api/citrone/user)
