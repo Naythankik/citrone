@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const crypto = require("crypto");
 const jwt = require('jsonwebtoken');
-const mail = require("../utils/mail");
+const {mail, generatePayload} = require("../utils");
 const { User } = require("../models");
 require('dotenv').config();
 const jwtSecret = process.env.JWT_SECRET
@@ -10,57 +10,49 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES
 const { signUpSchema, loginSchema } = require("../utils/joiSchema");
 const { doesUserExist, generateUsername } = require("../utils");
 
-const userLogin = async (req, res)=>{
+const userLogin = async (req, res) => {
     /**Validate the data in the req.body */
-    try{
-const validation = loginSchema(req.body)
-const {error, value} = validation
-if (error) {
-    return res
-    .status(StatusCodes.UNPROCESSABLE_ENTITY)
-    .json({message: error.details[0].message})
-}
-const {email, password} = value
-/**find a user with the provided email and check if the email and password matched */
-    User.findOne({email})
-    .then(user => {
-        if(!user){
+    const validation = loginSchema(req.body)
+    const { error, value } = validation
+    if (error) {
+        return res
+            .status(StatusCodes.UNPROCESSABLE_ENTITY)
+            .json({ message: error.details[0].message })
+    }
+    try {
+        /**find a user with the provided email and check if the email and password matched */
+        const { email, password } = value
+        const user = await User.findOne({ email })
+        if (!user) {
             return res
-            .status(StatusCodes.NOT_FOUND)
-            .send('user with email not found')       
+                .status(StatusCodes.NOT_FOUND)
+                .send('user with email not found')
         }
         const doesPasswordMatch = await user.comparePassword(password);
-        if(!doesPasswordMatch){
+        console.log('doesPasswordMatch', doesPasswordMatch);
+        if (!doesPasswordMatch) {
             return res
-            .status(StatusCodes.UNAUTHORIZED)
-            .send('wrong password provided try again with another password') 
+                .status(StatusCodes.UNAUTHORIZED)
+                .send('wrong password provided try again with another password')
         }
-        const payload = {
-            userId: user._id,
-            username: user.username,
-            role: user.role
-        }
-        const token = jwt.sign(payload, jwtSecret, {expiresIn: JWT_EXPIRES})
-         res.cookie('token', token, {
+        const payload = generatePayload(user)
+        console.log({ payload })
+        console.log({ jwtSecret })
+        const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES })
+        res.cookie('token', token, {
             httpOnly: true,
-            expires: new Date (Date.now() + JWT_EXPIRES),
+            expires: new Date(Date.now() + JWT_EXPIRES),
             signed: true
         })
         res.
-        status(StatusCodes.OK)
-        json({data: user})
-    })
-    .catch(err => {
+            status(StatusCodes.OK)
+        json({ data: user })
+    }
+    catch (err) {
         res
-        .status(StatusCodes.BAD_REQUEST)
-        .send(err.message)
-    })
-}
-catch (err) {
-    res
-        .status(StatusCodes.BAD_REQUEST)
-        .send(err.message)
-}
+            .status(StatusCodes.BAD_REQUEST)
+            .send(err.message)
+    }
 }
 
 const createAccount = async (req, res) => {
@@ -219,4 +211,5 @@ module.exports = {
   forgetPassword,
   resetPassword,
   updateUserProfile,
+  userLogin
 };

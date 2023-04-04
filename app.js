@@ -9,7 +9,7 @@ const { resetPassword } = require("./src/controllers/userControllers");
 
 const app = express();
 const PORT = process.env.PORT;
-connection();
+connection(); //server connection function
 
 //Middlewares
 app.use(express.json());

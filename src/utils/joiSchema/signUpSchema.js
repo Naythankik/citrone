@@ -3,7 +3,7 @@ function signUpSchema(data) { //user sign up schema (post & put request)
     const schema = Joi.object({
         firstName: Joi.string().min(2).max(16).valid().lowercase().required(),
         lastName: Joi.string().min(2).max(16).valid().lowercase().required(),
-        phoneNumber: Joi.string().min(8).max(12),
+        phoneNumber: Joi.number().integer().required(),
         email: Joi.string().email().required().lowercase(),
         password: Joi.string().alphanum().min(6).max(16).required(),
     })
