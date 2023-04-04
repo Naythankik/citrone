@@ -4,6 +4,7 @@
   Citrone makes it easy for educators to create learning experiences that positively engage students.
 
 ## Routings
+- Default routes : GET ["/", "/api/citrone/", "/*"]("/", "/api/citrone/", "/*")
 
 #### User Routes
 
@@ -12,4 +13,4 @@
 
 
 ### Password Reset
-- Reset User Password : POST : [/api/citrone/resetPassword/:token](/api/citrone/resetPassword/:token)
+- Reset user Password : POST : [/api/citrone/resetPassword/:token](/api/citrone/resetPassword/:token)
