@@ -4,6 +4,7 @@ const {
   getUserAccount,
 
   forgetPassword,
+  updateUserProfile,
 } = require("../src/controllers/userControllers");
 
 const router = express.Router();
@@ -16,6 +17,7 @@ router.get("/:id", getUserAccount);
 // router.route('/:id').get(getUserAccount)
 
 //create account (signUp) endpoint
-router.post("/", createAccount);
+router.route("/").post(createAccount);
+router.put("/:id", updateUserProfile);
 
 module.exports = router;

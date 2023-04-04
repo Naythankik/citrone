@@ -52,6 +52,20 @@ const getUserAccount = async (req, res) => {
   }
 };
 
+const updateUserProfile = async (req, res) => {
+  //use the authentication to fetch the user data from the database
+  const { id } = req.params.id;
+  try {
+    const user = await User.findById(id);
+
+    await User.findOneAndUpdate({ id }, { $set: req.body });
+    res.status(202).send("Profile has been edited!!!");
+  } catch (error) {
+    throw new Error(error);
+  }
+  return;
+};
+
 const forgetPassword = async (req, res) => {
   const { email } = req.body;
   try {
@@ -146,4 +160,5 @@ module.exports = {
   getUserAccount,
   forgetPassword,
   resetPassword,
+  updateUserProfile,
 };
