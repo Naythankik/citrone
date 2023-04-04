@@ -12,4 +12,4 @@
 
 
 ### Password Reset
-- Reset User Password : POST : [/api/citrone/resetPassword/:token] {/api/citrone/resetPassword/:token"}
+- Reset User Password : POST : [/api/citrone/resetPassword/:token](/api/citrone/resetPassword/:token)
