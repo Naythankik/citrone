@@ -4,13 +4,11 @@ const bcrypt = require("bcrypt");
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
-    lowerCase: true,
     required: [true, "first name is required"],
     min: 2,
   },
   lastName: {
     type: String,
-    lowerCase: true,
     required: [true, "last name is required"],
     min: 2,
   },
@@ -24,6 +22,7 @@ const userSchema = new mongoose.Schema({
   phoneNumber: {
     type: Number,
     required: [true, "phone number is required"],
+    unique: true,
     min: 10,
   },
   password: {
@@ -32,7 +31,7 @@ const userSchema = new mongoose.Schema({
     min: 6,
   },
   username: {
-    // a unique username will be generated for user
+    // a unique username will be generated for user by the server
     type: String,
     unique: true,
   },
@@ -44,6 +43,11 @@ const userSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: false,
+  },
+  status: { /** this will remain pending until email verification is done. */
+    type: String,
+    enum: ["approved", "pending"], 
+    default: "pending",
   },
   passwordResetToken: String,
   forgetPasswordExpires: Date,

@@ -1,2 +1,2 @@
 const { StatusCodes } = require("http-status-codes");
-const { User } = require("../models"); 
+const { User } = require("../../models"); 
