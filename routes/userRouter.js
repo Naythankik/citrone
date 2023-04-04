@@ -5,13 +5,19 @@ const {
   userLogin,
   forgetPassword,
   updateUserProfile,
+  userLogout
 } = require("../src/controllers/userControllers");
 
 const router = express.Router();
 
 //forget password and reset password
 router.post("/forget-password", forgetPassword);
+
+// login endpoint
 router.post('/login', userLogin);
+
+// logout endpoint
+router.get('/logout', userLogout);
 
 //get a user profile endpoint
 router.get("/:id", getUserAccount);

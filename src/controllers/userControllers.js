@@ -10,6 +10,7 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES
 const { signUpSchema, loginSchema } = require("../utils/joiSchema");
 const { doesUserExist, generateUsername } = require("../utils");
 
+/**user login controller */
 const userLogin = async (req, res) => {
     /**Validate the data in the req.body */
     const validation = loginSchema(req.body)
@@ -29,30 +30,42 @@ const userLogin = async (req, res) => {
                 .send('user with email not found')
         }
         const doesPasswordMatch = await user.comparePassword(password);
-        console.log('doesPasswordMatch', doesPasswordMatch);
         if (!doesPasswordMatch) {
             return res
                 .status(StatusCodes.UNAUTHORIZED)
                 .send('wrong password provided try again with another password')
         }
+        /**Attaching payload to cookie */
         const payload = generatePayload(user)
-        console.log({ payload })
-        console.log({ jwtSecret })
+
         const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES })
         res.cookie('token', token, {
             httpOnly: true,
-            expires: new Date(Date.now() + JWT_EXPIRES),
+            expiresIn: new Date(Date.now() + JWT_EXPIRES),
             signed: true
         })
+
+        user.isActive = true //the user is active (i.e online until he logout)
         res.
             status(StatusCodes.OK)
-        json({ data: user })
+            .json({ data: user })
     }
     catch (err) {
         res
             .status(StatusCodes.BAD_REQUEST)
             .send(err.message)
     }
+}
+
+/**user logout controller */
+const userLogout = async (req, res) => {
+    res.cookie('token', 'logout', {
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000)
+    })
+    res
+        .status(StatusCodes.OK)
+        .json({ msg: 'user logged out' })
 }
 
 const createAccount = async (req, res) => {
@@ -211,5 +224,6 @@ module.exports = {
   forgetPassword,
   resetPassword,
   updateUserProfile,
-  userLogin
+  userLogin,
+  userLogout
 };

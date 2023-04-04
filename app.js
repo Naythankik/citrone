@@ -2,6 +2,7 @@ const express = require("express");
 require("dotenv").config();
 const Helmet = require("helmet");
 const logger = require("morgan");
+const cookieParser = require("cookie-parser");
 const connection = require("./config/dbConnection");
 // const authRoutes = require("./routes/authRoutes");
 const userRouter = require("./routes/userRouter");
@@ -14,6 +15,7 @@ connection(); //server connection function
 //Middlewares
 app.use(express.json());
 app.use(logger("dev")); //logger to log every request and response summary
+app.use(cookieParser(process.env.COOKIE_PARSER_KEY))
 app.use(express.urlencoded({ extended: true }));
 
 //Routes
