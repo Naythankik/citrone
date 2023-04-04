@@ -7,4 +7,4 @@
 
 #### User Routes
 
-- Default user route : GET : "/api/citrone/user
+- Default user route : GET : (/api/citrone/user)
