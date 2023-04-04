@@ -8,3 +8,8 @@
 #### User Routes
 
 - Default user route : GET : (/api/citrone/user)
+
+
+
+### Password Reset
+- Reset User Password : POST : ("/api/citrone/resetPassword/:token") ["/api/citrone/resetPassword/:token"]
