@@ -53,6 +53,11 @@ const userSchema = new mongoose.Schema({
   token: String,
   passwordResetToken: String,
   forgetPasswordExpires: Date,
+  deactivate: {
+    type: Boolean,
+    default: false,
+  },
+  deactivateExpiresIn: Date,
 });
 
 // Hash the password before saving

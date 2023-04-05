@@ -138,8 +138,10 @@ const createAccount = async (req, res) => {
 };
 
 const getUserAccount = async (req, res) => {
+  const { userId } = req.user;
+
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(userId);
     if (!user) {
       res.status(StatusCodes.NOT_FOUND).json({ message: "User not found" });
       return;
@@ -151,17 +153,61 @@ const getUserAccount = async (req, res) => {
 };
 
 const updateUserProfile = async (req, res) => {
-  //use the authentication to fetch the user data from the database
-  const { id } = req.params;
-  try {
-    const user = await User.findById(id);
+  //use the authentication to receive user details from the payload saved to jwt
+  const { userId } = req.user;
 
-    await User.findOneAndUpdate({ id }, { $set: req.body });
-    res.status(202).send("Profile has been edited!!!");
+  //check if the req has role key
+  if (req.body.role) {
+    if (req.body.role !== "learner") {
+      res.status(401).send({ message: "User has no access to admin" });
+      return;
+    }
+  }
+
+  if (req.body.password) {
+    //if password is submitted by the user
+    res
+      .status(401)
+      .send({ message: "User can't change password via this endpoint" });
+    return;
+  }
+
+  try {
+    await User.findByIdAndUpdate(userId, { $set: req.body });
+
+    res.status(202).send({ message: "user profile has been edited!!!" });
+  } catch (error) {
+    throw new Error({ error });
+  }
+  return;
+};
+
+const deactivateAUser = async (req, res) => {
+  //when the login API is ready, use the authentication to fetch the user
+  //clear the session and cookie of the user
+  const { userId } = req.user;
+
+  try {
+    const user = await User.findByIdAndUpdate(userId, {
+      $set: {
+        deactivate: true,
+        deactivateExpiresIn: Date.now() + 1000 * 60 * 60 * 24 * 30,
+      },
+    });
+
+    if (!user) {
+      res.status(404).send({ message: "User not found" });
+      return;
+    }
+
+    //after user account has been deactivated
+    //logout user, then send a response
+
+    res.clearCookie("token", { httpOnly: true, secure: true });
+    res.status(200).send({ message: "Your account has been deactivated" });
   } catch (error) {
     throw new Error(error);
   }
-  return;
 };
 
 const forgetPassword = async (req, res) => {
@@ -261,4 +307,5 @@ module.exports = {
   updateUserProfile,
   userLogin,
   userLogout,
+  deactivateAUser,
 };
