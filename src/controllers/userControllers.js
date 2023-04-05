@@ -185,23 +185,25 @@ const updateUserProfile = async (req, res) => {
 const deactivateAUser = async (req, res) => {
   //when the login API is ready, use the authentication to fetch the user
   //clear the session and cookie of the user
-  const { id } = req.params;
+  const { userId } = req.user;
 
   try {
-    const user = await User.findByIdAndUpdate(id, {
+    const user = await User.findByIdAndUpdate(userId, {
       $set: {
         deactivate: true,
+        deactivateExpiresIn: Date.now() + 1000 * 60 * 60 * 24 * 30,
       },
     });
 
-    //if the user is null
     if (!user) {
-      res.status(400).send({ message: "No user found with the specified ID" });
+      res.status(404).send({ message: "User not found" });
       return;
     }
 
     //after user account has been deactivated
     //logout user, then send a response
+
+    res.clearCookie("token", { httpOnly: true, secure: true });
     res.status(200).send({ message: "Your account has been deactivated" });
   } catch (error) {
     throw new Error(error);

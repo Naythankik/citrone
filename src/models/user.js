@@ -57,6 +57,7 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  deactivateExpiresIn: Date,
 });
 
 // Hash the password before saving

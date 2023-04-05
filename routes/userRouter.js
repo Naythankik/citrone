@@ -27,6 +27,6 @@ router
   .post(createAccount)
   .get(authentication, getUserAccount)
   .put(authentication, updateUserProfile);
-router.route("/:id").post(deactivateAUser);
+router.post("/deactivate", authentication, deactivateAUser);
 
 module.exports = router;
