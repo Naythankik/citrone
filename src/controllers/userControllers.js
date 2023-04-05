@@ -1,9 +1,72 @@
 const { StatusCodes } = require("http-status-codes");
 const crypto = require("crypto");
-const mail = require("../utils/mail");
+const jwt = require('jsonwebtoken');
+const {mail, generatePayload} = require("../utils");
 const { User } = require("../models");
-const { signUpSchema } = require("../utils/joiSchema");
+require('dotenv').config();
+const jwtSecret = process.env.JWT_SECRET
+const JWT_EXPIRES = process.env.JWT_EXPIRES
+
+const { signUpSchema, loginSchema } = require("../utils/joiSchema");
 const { doesUserExist, generateUsername } = require("../utils");
+
+/**user login controller */
+const userLogin = async (req, res) => {
+    /**Validate the data in the req.body */
+    const validation = loginSchema(req.body)
+    const { error, value } = validation
+    if (error) {
+        return res
+            .status(StatusCodes.UNPROCESSABLE_ENTITY)
+            .json({ message: error.details[0].message })
+    }
+    try {
+        /**find a user with the provided email and check if the email and password matched */
+        const { email, password } = value
+        const user = await User.findOne({ email })
+        if (!user) {
+            return res
+                .status(StatusCodes.NOT_FOUND)
+                .send('user with email not found')
+        }
+        const doesPasswordMatch = await user.comparePassword(password);
+        if (!doesPasswordMatch) {
+            return res
+                .status(StatusCodes.UNAUTHORIZED)
+                .send('wrong password provided try again with another password')
+        }
+        /**Attaching payload to cookie */
+        const payload = generatePayload(user)
+
+        const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES })
+        res.cookie('token', token, {
+            httpOnly: true,
+            expiresIn: new Date(Date.now() + JWT_EXPIRES),
+            signed: true
+        })
+
+        user.isActive = true //the user is active (i.e online until he logout)
+        res.
+            status(StatusCodes.OK)
+            .json({ data: user })
+    }
+    catch (err) {
+        res
+            .status(StatusCodes.BAD_REQUEST)
+            .send(err.message)
+    }
+}
+
+/**user logout controller */
+const userLogout = async (req, res) => {
+    res.cookie('token', 'logout', {
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000)
+    })
+    res
+        .status(StatusCodes.OK)
+        .json({ msg: 'user logged out' })
+}
 
 const createAccount = async (req, res) => {
   try {
@@ -54,7 +117,7 @@ const getUserAccount = async (req, res) => {
 
 const updateUserProfile = async (req, res) => {
   //use the authentication to fetch the user data from the database
-  const { id } = req.params.id;
+  const { id } = req.params;
   try {
     const user = await User.findById(id);
 
@@ -161,4 +224,6 @@ module.exports = {
   forgetPassword,
   resetPassword,
   updateUserProfile,
+  userLogin,
+  userLogout
 };
