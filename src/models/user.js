@@ -44,11 +44,13 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  status: { /** this will remain pending until email verification is done. */
+  status: {
+    /** this will remain pending until email verification is done. */
     type: String,
-    enum: ["approved", "pending"], 
+    enum: ["approved", "pending"],
     default: "pending",
   },
+  token: String,
   passwordResetToken: String,
   forgetPasswordExpires: Date,
 });

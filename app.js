@@ -14,7 +14,13 @@ connection(); //server connection function
 //Middlewares
 app.use(express.json());
 app.use(logger("dev")); //logger to log every request and response summary
-app.use(cookieParser(process.env.COOKIE_PARSER_KEY));
+
+//Faruq
+// app.use(cookieParser(process.env.COOKIE_PARSER_KEY));
+
+//Main
+//I used this so i can get the cookie from the cookie request, to logout the user
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 //Routes

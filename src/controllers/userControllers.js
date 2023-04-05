@@ -1,72 +1,107 @@
 const { StatusCodes } = require("http-status-codes");
 const crypto = require("crypto");
-const jwt = require('jsonwebtoken');
-const {mail, generatePayload} = require("../utils");
+const jwt = require("jsonwebtoken");
+const { mail, generatePayload } = require("../utils");
 const { User } = require("../models");
-require('dotenv').config();
-const jwtSecret = process.env.JWT_SECRET
-const JWT_EXPIRES = process.env.JWT_EXPIRES
+require("dotenv").config();
+const jwtSecret = process.env.JWT_SECRET;
+const JWT_EXPIRES = process.env.JWT_EXPIRES;
 
 const { signUpSchema, loginSchema } = require("../utils/joiSchema");
 const { doesUserExist, generateUsername } = require("../utils");
 
 /**user login controller */
 const userLogin = async (req, res) => {
-    /**Validate the data in the req.body */
-    const validation = loginSchema(req.body)
-    const { error, value } = validation
-    if (error) {
-        return res
-            .status(StatusCodes.UNPROCESSABLE_ENTITY)
-            .json({ message: error.details[0].message })
-    }
-    try {
-        /**find a user with the provided email and check if the email and password matched */
-        const { email, password } = value
-        const user = await User.findOne({ email })
-        if (!user) {
-            return res
-                .status(StatusCodes.NOT_FOUND)
-                .send('user with email not found')
-        }
-        const doesPasswordMatch = await user.comparePassword(password);
-        if (!doesPasswordMatch) {
-            return res
-                .status(StatusCodes.UNAUTHORIZED)
-                .send('wrong password provided try again with another password')
-        }
-        /**Attaching payload to cookie */
-        const payload = generatePayload(user)
+  /**Validate the data in the req.body */
+  const { error, value } = loginSchema(req.body);
 
-        const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES })
-        res.cookie('token', token, {
-            httpOnly: true,
-            expiresIn: new Date(Date.now() + JWT_EXPIRES),
-            signed: true
-        })
+  if (error) {
+    return res
+      .status(StatusCodes.UNPROCESSABLE_ENTITY)
+      .json({ message: error.details[0].message });
+  }
+  try {
+    /**find a user with the provided email and check if the email and password matched */
+    const { email, password } = value;
+    const user = await User.findOne({ email });
 
-        user.isActive = true //the user is active (i.e online until he logout)
-        res.
-            status(StatusCodes.OK)
-            .json({ data: user })
+    if (!user) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .send("user with email not found");
     }
-    catch (err) {
-        res
-            .status(StatusCodes.BAD_REQUEST)
-            .send(err.message)
+
+    const doesPasswordMatch = await user.comparePassword(password);
+    if (!doesPasswordMatch) {
+      return res.status(StatusCodes.UNAUTHORIZED).send("Password is incorrect");
     }
-}
+
+    /**Attaching payload to cookie */
+    const payload = generatePayload(user);
+
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      expiresIn: new Date(Date.now() + JWT_EXPIRES),
+    });
+
+    user.isActive = true; //the user is active (i.e online until he logout)
+    user.token = token; // using the token to logout user
+
+    //save the user data
+    await user.save();
+
+    res.status(StatusCodes.OK).json({ data: user });
+  } catch (err) {
+    res.status(StatusCodes.BAD_REQUEST).send(err.message);
+  }
+};
 
 /**user logout controller */
 const userLogout = async (req, res) => {
-    res.cookie('token', 'logout', {
-        httpOnly: true,
-        expires: new Date(Date.now() + 1000)
-    })
-    res
-        .status(StatusCodes.OK)
-        .json({ msg: 'user logged out' })
-}
+  const { token } = req.cookies;
+
+  //check if cookie is true
+  if (!token) {
+    res.status(401).send({ message: "User is not logged in" });
+    return;
+  }
+
+  //use the token to find the user from the database
+  try {
+    const user = await User.findOne({ token: token });
+
+    // if user returns null
+    if (!user) {
+      return res.status(204).send({ message: "User is not active" });
+    }
+
+    //if user returns true, update the user document
+    await User.findOneAndUpdate(
+      { token },
+      {
+        $set: {
+          isActive: false,
+          token: "",
+        },
+      }
+    );
+
+    //clear the cookie after the user document has been updated
+    res.clearCookie("token", { httpOnly: true, secure: true });
+
+    res.status(200).send({ message: "user logged out" });
+  } catch (error) {
+    throw new Error({ Error: error });
+  }
+  return;
+  // res.cookie("token", "logout", {
+  //   httpOnly: true,
+  //   expires: new Date(Date.now() + 1000),
+  // });
+  // res.status(StatusCodes.OK).json({ msg: "user logged out" });
+};
 
 const createAccount = async (req, res) => {
   try {
@@ -225,5 +260,5 @@ module.exports = {
   resetPassword,
   updateUserProfile,
   userLogin,
-  userLogout
+  userLogout,
 };
