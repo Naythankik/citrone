@@ -12,6 +12,14 @@ const { doesUserExist, generateUsername } = require("../utils");
 
 /**user login controller */
 const userLogin = async (req, res) => {
+  const { token } = req.cookies;
+
+  //if token exist, return a response to the user to logout
+  if (token) {
+    res.status(400).send({ message: "User have to logout" });
+    return;
+  }
+
   /**Validate the data in the req.body */
   const { error, value } = loginSchema(req.body);
 
