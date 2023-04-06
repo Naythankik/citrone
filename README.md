@@ -8,12 +8,14 @@
 
 #### User Routes
 
-- Default user route : GET : [/api/citrone/user](/api/citrone/user)
-- Create a user : POST :  [/api/citrone/user](/api/citrone/user)
-- Forget Password : POST : [/api/citrone/user/forget-password](/forget-password)
-- Get a user profile : GET : [/api/citrone/user/:id](/api/citrone/user/:id)
-- update a user profile : PUT : [/api/citrone/user/:id](/api/citrone/user/:id)
+- Default user route / Get a user profile : GET : [/api/citrone/user](/api/citrone/user)
+- Create a user : POST :  [/api/citrone/auth](/api/citrone/user)
+- update a user profile : PUT :  [/api/citrone/user](/api/citrone/user)
 
+- logout a user : POST :  [/api/citrone/auth/logout](/api/citrone/user/logout)
+- login a user : POST :  [/api/citrone/auth/login](/api/citrone/user/login)
+
+- Forget Password : POST : [/api/citrone/auth/forget-password](/forget-password)
 
 
 ### Password Reset
