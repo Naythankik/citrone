@@ -19,7 +19,7 @@ router.post("/login", userLogin);
 router.get("/logout", authentication, userLogout);
 
 //create account (signUp) endpoint
-router.route("/").post(createAccount)
+router.route("/").post(createAccount);
 
 // router.post("/deactivate", authentication, deactivateAUser);
 

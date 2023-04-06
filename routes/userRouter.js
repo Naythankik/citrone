@@ -1,23 +1,12 @@
 const express = require("express");
 const {
-  createAccount,
   getUserAccount,
-  forgetPassword,
   updateUserProfile,
-  deactivateAUser,
 } = require("../src/controllers/userControllers");
+const { authentication } = require("../src/middlewares/authentication");
 
 const router = express.Router();
 
-//forget password and reset password
-router.post("/forget-password", forgetPassword);
-
-//get a user profile endpoint
-router.get("/:id", getUserAccount);
-// router.route('/:id').get(getUserAccount)
-
-//create account (signUp) endpoint
-router.route("/").post(createAccount);
-router.route("/:id").put(updateUserProfile).post(deactivateAUser);
+router.route("/").get(getUserAccount).put(updateUserProfile);
 
 module.exports = router;
