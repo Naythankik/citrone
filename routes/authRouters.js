@@ -1,13 +1,10 @@
 const express = require("express");
 const {
   createAccount,
-  getUserAccount,
   userLogin,
   forgetPassword,
-  updateUserProfile,
   userLogout,
-  deactivateAUser,
-} = require("../src/controllers/userControllers");
+} = require("../src/controllers/auth");
 const { authentication } = require("../src/middlewares/authentication");
 
 const router = express.Router();
@@ -22,11 +19,8 @@ router.post("/login", userLogin);
 router.get("/logout", authentication, userLogout);
 
 //create account (signUp) endpoint
-router
-  .route("/")
-  .post(createAccount)
-  .get(authentication, getUserAccount)
-  .put(authentication, updateUserProfile);
-router.post("/deactivate", authentication, deactivateAUser);
+router.route("/").post(createAccount)
+
+// router.post("/deactivate", authentication, deactivateAUser);
 
 module.exports = router;

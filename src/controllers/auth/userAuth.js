@@ -82,7 +82,7 @@ const createAccount = async (req, res) => {
       User,
       validation.value,
       "email",
-      "mobileNumber"
+      "phoneNumber"
     );
     if (userAlreadyExist) {
       return res
