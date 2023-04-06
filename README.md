@@ -12,7 +12,7 @@
 - Create a user : POST :  [/api/citrone/auth](/api/citrone/user)
 - update a user profile : PUT :  [/api/citrone/user](/api/citrone/user)
 
-- logout a user : POST :  [/api/citrone/auth/logout](/api/citrone/user/logout)
+- logout a user : GET :  [/api/citrone/auth/logout](/api/citrone/user/logout)
 - login a user : POST :  [/api/citrone/auth/login](/api/citrone/user/login)
 
 - Forget Password : POST : [/api/citrone/auth/forget-password](/forget-password)
