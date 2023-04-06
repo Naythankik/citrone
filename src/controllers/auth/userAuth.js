@@ -42,8 +42,7 @@ const userLogin = async (req, res) => {
         res.cookie('token', token, {
             httpOnly: true,
             expiresIn: new Date(Date.now() + JWT_EXPIRES),
-            signed: true
-        })
+        }) 
 
         user.isActive = true //the user is active (i.e online until he logout)
         res.
@@ -65,7 +64,7 @@ const userLogout = async (req, res) => {
     })
     res
         .status(StatusCodes.OK)
-        .json({ msg: 'user logged out' })
+        .json({ message: 'user logged out' })
 }
 
 const createAccount = async (req, res) => {
