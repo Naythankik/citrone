@@ -5,8 +5,10 @@ const {
   userLogin,
   forgetPassword,
   updateUserProfile,
-  userLogout
-} = require("../src/controllers/auth/userAuth");
+  userLogout,
+  deactivateAUser,
+} = require("../src/controllers/userControllers");
+const { authentication } = require("../src/middlewares/authentication");
 
 const router = express.Router();
 
@@ -14,17 +16,17 @@ const router = express.Router();
 router.post("/forget-password", forgetPassword);
 
 // login endpoint
-router.post('/login', userLogin);
+router.post("/login", userLogin);
 
 // logout endpoint
-router.get('/logout', userLogout);
-
-//get a user profile endpoint
-router.get("/:id", getUserAccount);
-// router.route('/:id').get(getUserAccount)
+router.get("/logout", authentication, userLogout);
 
 //create account (signUp) endpoint
-router.route("/").post(createAccount);
-router.put("/:id", updateUserProfile);
+router
+  .route("/")
+  .post(createAccount)
+  .get(authentication, getUserAccount)
+  .put(authentication, updateUserProfile);
+router.post("/deactivate", authentication, deactivateAUser);
 
 module.exports = router;
