@@ -7,6 +7,7 @@ const userRouter = require("./routes/userRouter");
 const { authRouter } = require("./routes/index");
 const { resetPassword } = require("./src/controllers/userControllers");
 const { authentication } = require("./src/middlewares/authentication");
+const { User } = require("./src/models");
 
 const app = express();
 const PORT = process.env.PORT;
@@ -20,6 +21,11 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 //Routes
+app.get("api/citrone/", async (req, res) => {
+  const users = await User.find();
+  res.status(200).send({ message: users });
+  return;
+});
 app.post("/api/citrone/resetPassword/:token", resetPassword);
 app.use("/api/citrone/auth", authRouter);
 app.use("/api/citrone/user", authentication, userRouter);
