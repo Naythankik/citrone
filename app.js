@@ -1,12 +1,12 @@
 const express = require("express");
 require("dotenv").config();
-const Helmet = require("helmet");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const connection = require("./config/dbConnection");
-// const authRoutes = require("./routes/authRoutes");
 const userRouter = require("./routes/userRouter");
+const { authRouter } = require("./routes/index");
 const { resetPassword } = require("./src/controllers/userControllers");
+const { authentication } = require("./src/middlewares/authentication");
 
 const app = express();
 const PORT = process.env.PORT;
@@ -16,20 +16,15 @@ connection(); //server connection function
 app.use(express.json());
 app.use(logger("dev")); //logger to log every request and response summary
 
-//Faruq
-// app.use(cookieParser(process.env.COOKIE_PARSER_KEY));
-
-//Main
-//I used this so i can get the cookie from the cookie request, to logout the user
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 //Routes
 app.post("/api/citrone/resetPassword/:token", resetPassword);
-app.use("/api/citrone/user", userRouter);
 app.use("/api/citrone/auth", authRouter);
+app.use("/api/citrone/user", authentication, userRouter);
 
-app.use(["/", "/api/citrone/", "/*"], (req, res) => {
+app.use(["/", "/api/citrone/"], (req, res) => {
   res.status(400).json({ message: "Welcome to Citrone" });
 });
 app.listen(PORT, () => {
