@@ -6,7 +6,7 @@ const cookieParser = require("cookie-parser");
 const connection = require("./config/dbConnection");
 // const authRoutes = require("./routes/authRoutes");
 const userRouter = require("./routes/userRouter");
-const { resetPassword } = require("./src/controllers/userControllers");
+const { resetPassword } = require("./src/controllers/auth/userAuth");
 
 const app = express();
 const PORT = process.env.PORT;
