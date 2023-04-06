@@ -21,7 +21,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 //Routes
-app.get("api/citrone/", async (req, res) => {
+app.get("/api/citrone/getUsers", async (req, res) => {
   const users = await User.find();
   res.status(200).send({ message: users });
   return;
