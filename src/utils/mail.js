@@ -28,4 +28,6 @@ const mailer = async (data) => {
   });
 };
 
+
+
 module.exports = mailer;
