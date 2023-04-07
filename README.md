@@ -13,10 +13,12 @@
 
 - logout a user : GET :  [/api/citrone/auth/logout](/api/citrone/user/logout)
 - login a user : POST :  [/api/citrone/auth/login](/api/citrone/user/login)
+    - input text : [email,password]
 
 - Create a user : POST :  [/api/citrone/auth](/api/citrone/user)
     - input text : [firstName,lastName,phoneNumber,email,password]
 - update a user profile : PUT :  [/api/citrone/user](/api/citrone/user)
+    - input text : [firstName,lastName,email,username,phoneNumber,]
 
 
 - Forget Password : POST : [/api/citrone/auth/forget-password](/forget-password)
@@ -24,4 +26,4 @@
 
 ### Password Reset
 - Reset Password : POST : [/api/citrone/resetPassword/:token](/api/citrone/resetPassword/:token)
-    - input text : name="password" and name="confirmPassword" 
+    - input text : [password,confirmPassword] 
