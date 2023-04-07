@@ -12,13 +12,13 @@ const generateSignUpMail = async (req, res, next) => {
 
     /** my gmail information */
     const config = {
-      //   service: "gmail",
-      service: process.env.MAIL_HOST,
+      service: "gmail",
       auth: {
         user: process.env.EMAIL,
         pass: process.env.EMAIL_PASS,
       },
     };
+
     const maxAge = "10m";
     const token = jwt.sign(payload, JWT_SECRET, {
       expiresIn: maxAge, // 10mins
