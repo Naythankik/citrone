@@ -6,6 +6,7 @@ const {
   userLogout,
 } = require("../src/controllers/auth");
 const { authentication } = require("../src/middlewares/authentication");
+const {generateSignUpMail,verifySignUpMail} = require("../src/middlewares/createAccount")
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ router.post("/login", userLogin);
 router.get("/logout", authentication, userLogout);
 
 //create account (signUp) endpoint
-router.route("/").post(createAccount);
+router.route("/").post(createAccount, generateSignUpMail);
 
 // router.post("/deactivate", authentication, deactivateAUser);
 

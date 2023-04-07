@@ -71,7 +71,7 @@ const userLogout = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: "user logged out" });
 };
 
-const createAccount = async (req, res) => {
+const createAccount = async (req, res, next) => {
   try {
     //validating the user's inputed data with joi schema
     const validation = signUpSchema(req.body);
