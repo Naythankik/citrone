@@ -15,6 +15,7 @@
 - login a user : POST :  [/api/citrone/auth/login](/api/citrone/user/login)
 
 - Create a user : POST :  [/api/citrone/auth](/api/citrone/user)
+    - input text : [firstName,lastName,phoneNumber,email,password]
 - update a user profile : PUT :  [/api/citrone/user](/api/citrone/user)
 
 
