@@ -22,6 +22,7 @@
 
 
 - Forget Password : POST : [/api/citrone/auth/forget-password](/forget-password)
+    - input text : [email]
 
 
 ### Password Reset
