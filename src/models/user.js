@@ -53,6 +53,7 @@ const userSchema = new mongoose.Schema(
     },
     passwordResetToken: String,
     forgetPasswordExpires: Date,
+    registrationToken: String,
   },
   { timestamps: true }
 );

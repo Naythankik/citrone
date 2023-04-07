@@ -17,7 +17,9 @@ const userLogin = async (req, res) => {
   const { token } = req.cookies;
 
   if (token) {
-    res.status(400).send({ message: "A user is active at the moment on this device" });
+    res
+      .status(400)
+      .send({ message: "A user is active at the moment on this device" });
     return;
   }
 
@@ -101,12 +103,10 @@ const createAccount = async (req, res, next) => {
 
     req.body.payload = payload;
     next();
-
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err.message);
   }
-}
-
+};
 
 const forgetPassword = async (req, res) => {
   const { email } = req.body;

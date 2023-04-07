@@ -6,7 +6,7 @@ const connection = require("./config/dbConnection");
 const userRouter = require("./routes/userRouter");
 const { authRouter } = require("./routes/index");
 const { resetPassword } = require("./src/controllers/userControllers");
-const {verifySignUpMail} = require("./src/middlewares/createAccount")
+const { verifySignUpMail } = require("./src/middlewares/createAccount");
 const { authentication } = require("./src/middlewares/authentication");
 const { User } = require("./src/models");
 
@@ -32,7 +32,7 @@ app.post("/api/citrone/resetPassword/:token", resetPassword);
 app.use("/api/citrone/auth", authRouter);
 app.use("/api/citrone/user", authentication, userRouter);
 
-app.use(["/", "/api/citrone/"], (req, res) => {
+app.use(["/", "/api/citrone"], (req, res) => {
   res.status(400).json({ message: "Welcome to Citrone" });
 });
 app.listen(PORT, () => {
