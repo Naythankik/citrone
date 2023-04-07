@@ -135,6 +135,7 @@ const createAccount = async (req, res, next) => {
 
 const forgetPassword = async (req, res) => {
   const { email } = req.body;
+
   try {
     //find the email from the user schema
     const user = await User.findOne({ email });
@@ -149,7 +150,8 @@ const forgetPassword = async (req, res) => {
       .createHash("sha256")
       .update(token)
       .digest("hex");
-    user.forgetPasswordExpires = Date.now() + 1000 * 60 * 10; //? how will this work
+
+    user.forgetPasswordExpires = Date.now() + 1000 * 60 * 10; //The token shout last for 10 mins
 
     //create data for mailing
     const data = {
@@ -170,6 +172,7 @@ const forgetPassword = async (req, res) => {
     };
 
     mail(data);
+
     await user.save();
 
     res
