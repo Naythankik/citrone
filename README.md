@@ -23,4 +23,4 @@
 
 ### Password Reset
 - Reset Password : POST : [/api/citrone/resetPassword/:token](/api/citrone/resetPassword/:token)
-+ input text : name="password" and name="confirmPassword" 
+            + input text : name="password" and name="confirmPassword" 
