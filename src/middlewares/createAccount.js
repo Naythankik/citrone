@@ -17,7 +17,6 @@ const config = {
         pass: process.env.EMAIL_PASS
     }
 }
-
     const maxAge = '10m'
     const token = jwt.sign(
         payload,
@@ -35,23 +34,24 @@ const config = {
     let MailGenerator = new Mailgen({
         theme: "default",
         product : {
-            name: "Mailgen",
-            link :  `http://localhost:3000/register/verify/${token}`
+            name: "Stutern",
+            link :  `http://www.stutern.com`
         }
     })
 
     let response = {
         body: {
-          name: 'Jon Doe',
-          intro: 'Welcome to email verification',
+          name: payload.username,
+          intro: 'Welcome Stutern Citrone Platform',
           action: {
             instructions: 'Please click the button below to verify your account',
             button: {
-              color: 'blue',
-              text: 'Verify account',
-              link: 'http://example.com/verify_account',
+              color: 'green',
+              text: 'Verify email address',
+              link: `http://localhost:8070/api/citrone/email/verify/${token}`,
             },
           },
+          outro: 'happy learning. we wish you the very best'
         },
       }
 
@@ -60,7 +60,7 @@ const config = {
     const message = {
         from: 'faruqhameed1@gmail.com',
         to: 'seroca2770@dogemn.com',
-        subject: 'citrone email verification',
+        subject: 'citrone email verification one',
         html: mail
     }
     transporter.sendMail(message).then((info) => {
@@ -79,23 +79,19 @@ const config = {
 
 const verifySignUpMail = async (req, res) => {
     try {
-        const { token } = await req.params
-        const verifyToken = jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
-            if (err) {
+        const { token } = req.params
+        const verifyToken = jwt.verify(token, JWT_SECRET)
+        
+            if(!verifyToken) {
                 return res
                     .status(401).send({ message: 'email verification failed, sign up again' })
             }
-            const { payload } = decodedToken.payload
-            User.findByIdAndUpdate(payload.userId, {status: 'approved'})
+
+            await User.findByIdAndUpdate(verifyToken.userId, {status: 'approved'})
             res
-            .status(StatusCodes.OK)
-            .send(
-                `<a href=${process.env.APP_URL}${process.env.PORT}/api/citrone/login></a>`
-                `<p>Your email address has been successfully verified.</p>
-            <p>Please click <a href="/login">here</a> to log in.</p>`
-            )
-            
-        })
+                .status(StatusCodes.OK)
+                .send( {message: 'account creation successfully kindly go login'})
+
     }
     catch (err) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: err.message })
