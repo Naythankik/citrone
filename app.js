@@ -6,6 +6,7 @@ const connection = require("./config/dbConnection");
 const userRouter = require("./routes/userRouter");
 const { authRouter } = require("./routes/index");
 const { resetPassword } = require("./src/controllers/userControllers");
+const {verifySignUpMail} = require("./src/middlewares/createAccount")
 const { authentication } = require("./src/middlewares/authentication");
 const { User } = require("./src/models");
 
@@ -20,6 +21,7 @@ app.use(logger("dev")); //logger to log every request and response summary
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/api/citrone/email/verify/:token", verifySignUpMail);
 //Routes
 app.get("/api/citrone/getUsers", async (req, res) => {
   const users = await User.find();

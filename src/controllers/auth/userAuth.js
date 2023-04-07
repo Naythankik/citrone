@@ -9,6 +9,7 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES;
 
 const { signUpSchema, loginSchema } = require("../../utils/joiSchema");
 const { doesUserExist, generateUsername } = require("../../utils");
+const { request } = require("http");
 
 /**user login controller */
 const userLogin = async (req, res) => {
@@ -16,7 +17,7 @@ const userLogin = async (req, res) => {
   const { token } = req.cookies;
 
   if (token) {
-    res.status(400).send({ message: "A user is active at the moment" });
+    res.status(400).send({ message: "A user is active at the moment on this device" });
     return;
   }
 
@@ -70,7 +71,7 @@ const userLogout = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: "user logged out" });
 };
 
-const createAccount = async (req, res) => {
+const createAccount = async (req, res, next) => {
   try {
     //validating the user's inputed data with joi schema
     const validation = signUpSchema(req.body);
@@ -96,13 +97,16 @@ const createAccount = async (req, res) => {
     const newUser = new User(validation.value);
     newUser.username = await generateUsername(User, newUser.firstName); //generating a username for the new user
     await newUser.save();
-    res
-      .status(StatusCodes.OK)
-      .json({ message: "account created successfully", data: newUser });
+    const payload = generatePayload(newUser);
+
+    req.body.payload = payload;
+    next();
+
   } catch (err) {
-    res.status(StatusCodes.BAD_REQUEST).send(err.message);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err.message);
   }
-};
+}
+
 
 const forgetPassword = async (req, res) => {
   const { email } = req.body;
@@ -120,7 +124,7 @@ const forgetPassword = async (req, res) => {
       .createHash("sha256")
       .update(token)
       .digest("hex");
-    user.forgetPasswordExpires = Date.now() + 1000 * 60 * 10;
+    user.forgetPasswordExpires = Date.now() + 1000 * 60 * 10; //? how will this work
 
     //create data for mailing
     const data = {
@@ -150,7 +154,6 @@ const forgetPassword = async (req, res) => {
   } catch (error) {
     throw new Error(error);
   }
-  return;
 };
 
 const resetPassword = async (req, res) => {
