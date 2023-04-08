@@ -2,13 +2,12 @@ const { default: mongoose } = require("mongoose");
 
 const Lesson = new mongoose.Schema(
   {
-    module: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "module",
-        select: false,
-      },
-    ],
+    module: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "module",
+      select: false,
+    },
+
     title: {
       type: String,
       unique: true,
