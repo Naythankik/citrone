@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema(
       enum: ["approved", "pending"],
       default: "pending",
     },
+    lesson: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "lesson",
+    },
     passwordResetToken: String,
     forgetPasswordExpires: Date,
     registrationToken: String,
