@@ -2,10 +2,10 @@ const { default: mongoose } = require("mongoose");
 
 const Lesson = new mongoose.Schema(
   {
-    course: [
+    module: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "course",
+        ref: "module",
         select: false,
       },
     ],
@@ -29,10 +29,12 @@ const Lesson = new mongoose.Schema(
       type: String,
       required: true,
     },
-    quiz: {
-      type: String,
-      required: true,
-    },
+    quiz: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "quiz",
+      },
+    ],
   },
   { timestamps: true }
 );
