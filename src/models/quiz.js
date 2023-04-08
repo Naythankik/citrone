@@ -5,6 +5,7 @@ const Quiz = new mongoose.Schema(
     lesson: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "lesson",
+      required: true
     },
     questions: [
       {
@@ -12,6 +13,8 @@ const Quiz = new mongoose.Schema(
         options: Array,
         answer: {
           type: String,
+          enum: ['a', 'b', 'c', 'd'],
+          required: [true, 'please provide the answer']
         },
       },
     ],
