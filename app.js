@@ -22,6 +22,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/api/citrone/email/verify/:token", verifySignUpMail);
+
 //Routes
 app.get("/api/citrone/getUsers", async (req, res) => {
   const users = await User.find();
@@ -32,6 +33,7 @@ app.post("/api/citrone/resetPassword/:token", resetPassword);
 app.use("/api/citrone/auth", authRouter);
 app.use("/api/citrone/user", authentication, userRouter);
 
+//default routes
 app.use(["/", "/api/citrone"], (req, res) => {
   res.status(400).json({ message: "Welcome to Citrone" });
 });

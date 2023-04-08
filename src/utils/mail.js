@@ -19,7 +19,7 @@ const mailer = async (data) => {
   });
 
   // send mail with defined transport object
-  let info = await transporter.sendMail({
+  await transporter.sendMail({
     from: `"Citrone" ${process.env.MAIL_FROM}`, // sender address
     to: data.to, // list of receivers
     subject: data.subject, // Subject line
@@ -27,7 +27,5 @@ const mailer = async (data) => {
     html: data.html, // html body
   });
 };
-
-
 
 module.exports = mailer;

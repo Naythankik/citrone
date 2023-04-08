@@ -40,12 +40,20 @@ const userLogin = async (req, res) => {
         .status(StatusCodes.NOT_FOUND)
         .send("user with email not found");
     }
+
     const doesPasswordMatch = await user.comparePassword(password);
     if (!doesPasswordMatch) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
         .send("wrong password provided try again with another password");
     }
+
+    //check if the user status is pending
+    if (user.status !== "approved") {
+      res.status(401).send({ message: "user account has not been verified" });
+      return;
+    }
+
     /**Attaching payload to cookie */
     const payload = generatePayload(user);
 
@@ -66,10 +74,27 @@ const userLogin = async (req, res) => {
 
 /**user logout controller */
 const userLogout = async (req, res) => {
-  res.cookie("token", "logout", {
-    httpOnly: true,
-    expires: new Date(Date.now() + 1000),
+  const { token } = req.cookies;
+
+  // fetch the user id from the token
+  const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+
+  // update the user isActive status to false
+  await User.findByIdAndUpdate(userId, {
+    $set: {
+      isActive: false,
+    },
   });
+
+  //clear the authenticated user token after updating the user
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+  });
+  // res.cookie("token", "logout", {
+  //   httpOnly: true,
+  //   expires: new Date(Date.now() + 1000),
+  // });
   res.status(StatusCodes.OK).json({ message: "user logged out" });
 };
 
@@ -110,6 +135,7 @@ const createAccount = async (req, res, next) => {
 
 const forgetPassword = async (req, res) => {
   const { email } = req.body;
+
   try {
     //find the email from the user schema
     const user = await User.findOne({ email });
@@ -124,7 +150,8 @@ const forgetPassword = async (req, res) => {
       .createHash("sha256")
       .update(token)
       .digest("hex");
-    user.forgetPasswordExpires = Date.now() + 1000 * 60 * 10; //? how will this work
+
+    user.forgetPasswordExpires = Date.now() + 1000 * 60 * 10; //The token shout last for 10 mins
 
     //create data for mailing
     const data = {
@@ -145,6 +172,7 @@ const forgetPassword = async (req, res) => {
     };
 
     mail(data);
+
     await user.save();
 
     res
