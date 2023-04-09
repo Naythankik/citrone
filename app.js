@@ -21,14 +21,16 @@ app.use(logger("dev")); //logger to log every request and response summary
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/api/citrone/email/verify/:token", verifySignUpMail);
-
-//Routes
 app.get("/api/citrone/getUsers", async (req, res) => {
   const users = await User.find();
   res.status(200).send({ message: users });
   return;
 });
+
+app.get("/api/citrone/email/verify/:token", verifySignUpMail);
+
+//Routes
+
 app.post("/api/citrone/resetPassword/:token", resetPassword);
 app.use("/api/citrone/auth", authRouter);
 app.use("/api/citrone/user", authentication, userRouter);

@@ -1,5 +1,6 @@
 const { Module, Lesson, Course } = require("../models");
 const slugify = require("slugify");
+const Joi = require("joi");
 
 // when a user wants to get all the levels of the DBs
 const getCoursesLevel = async (req, res) => {
@@ -14,12 +15,25 @@ const getCoursesLevel = async (req, res) => {
 
 //create a Course level for the Document
 const postCourseLevel = async (req, res) => {
+  //validation for the input submitted by the user
+  const courseInput = Joi.object({
+    level: Joi.string().lowercase().required(),
+  });
+  const { error, value } = courseInput.validate(req.body);
+
+  //check if error is true and send the response back to the user
+  if (error) {
+    res.status(400).send({ message: error.details[0].message });
+    return;
+  }
+
   try {
-    await Course.create(req.body);
+    await Course.create(value);
     res.status(200).send({ message: "course has been created" });
   } catch (error) {
     throw new Error(error);
   }
+  return;
 };
 
 //when a user wants to access all modules for a specified level

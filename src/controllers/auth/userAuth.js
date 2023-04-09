@@ -25,6 +25,7 @@ const userLogin = async (req, res) => {
 
   /**Validate the data in the req.body */
   const validation = loginSchema(req.body);
+
   const { error, value } = validation;
   if (error) {
     return res
