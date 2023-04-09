@@ -39,6 +39,7 @@ app.use("/api/citrone/user", authentication, userRouter);
 app.use(["/", "/api/citrone"], (req, res) => {
   res.status(400).json({ message: "Welcome to Citrone" });
 });
+
 app.listen(PORT, () => {
   console.log(`App is running on ${PORT}`);
 });

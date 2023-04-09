@@ -9,12 +9,11 @@ const authorization = async (req, res, next) => {
 
     if (user.role !== "admin") {
       res.status(401).send({ error: "you're not an admin" });
-    } else {
-      next();
+      return;
     }
-    return;
+    next();
   } catch (error) {
-    throw new Error(error);
+    res.status(500).send({ error: error.message });
   }
 };
 

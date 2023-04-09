@@ -4,4 +4,5 @@ module.exports = {
   Module: require("./course/module"),
   Quiz: require("./course/quiz"),
   Course: require("./course/course"),
+  Chat: require("./chat"),
 };
