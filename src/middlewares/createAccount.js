@@ -3,7 +3,7 @@ const Mailgen = require("mailgen");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models");
-require("dotenv").config();
+// require("dotenv").config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const generateSignUpMail = async (req, res, next) => {
@@ -11,6 +11,10 @@ const generateSignUpMail = async (req, res, next) => {
     const { payload } = req.body;
 
     /** my gmail information */
+
+    //The config object is missing a secure and port field,
+    //There by stopping the email from sending
+
     const config = {
       service: "gmail",
       auth: {
@@ -25,7 +29,7 @@ const generateSignUpMail = async (req, res, next) => {
     });
 
     // send the token to the database and the email address of the user
-    await User.findByIdAndUpdate(payload.userId, {
+    const user = await User.findByIdAndUpdate(payload.userId, {
       $set: { registrationToken: token },
     });
 
@@ -58,8 +62,8 @@ const generateSignUpMail = async (req, res, next) => {
     let mail = MailGenerator.generate(response);
 
     const message = {
-      from: "faruqhameed1@gmail.com",
-      to: "seroca2770@dogemn.com",
+      from: "faruqhameed1@gmail.com", //save a sender on the .env and fetch
+      to: user.email,
       subject: "citrone email verification one",
       html: mail,
     };
@@ -79,6 +83,7 @@ const generateSignUpMail = async (req, res, next) => {
 const verifySignUpMail = async (req, res) => {
   try {
     const { token } = req.params;
+
     const verifyToken = jwt.verify(token, JWT_SECRET);
 
     if (!verifyToken) {
