@@ -107,14 +107,19 @@ const createAModule = async (req, res) => {
 
 //when the user wants to see all lessons for a module
 const getModule = async (req, res) => {
-  const { title } = req.params;
-
+  //try destruction of the requset parameter
   try {
-    const module = await Module.findOne({ slug_title: title }).populate(
-      "lesson"
-    );
+    const { title } = req.params;
 
-    res.status(200).send({ lesson: module });
+    try {
+      const module = await Module.findOne({ slug_title: title }).populate(
+        "lesson"
+      );
+
+      res.status(200).send({ lesson: module });
+    } catch (error) {
+      throw new Error(error);
+    }
   } catch (error) {
     throw new Error(error);
   }
@@ -122,12 +127,28 @@ const getModule = async (req, res) => {
 
 //creating a lesson for a specified module
 const createLesson = async (req, res) => {
+  const { id } = await Module.findOne({ slug_title: req.params.title });
+
+  //valiation of the lesson request body
+  const lessonValidation = Joi.object({
+    title: Joi.string().lowercase().required(),
+    description: Joi.string().lowercase().required(),
+    slides: Joi.string().lowercase().required(),
+    assignment: Joi.string().lowercase().required(),
+    recorded_session: Joi.string().lowercase().required(),
+  });
+
+  const { error, value } = lessonValidation.validate(req.body);
+
+  //if error is true
+  if (error) {
+    res.status(400).send({ message: error.details[0].message });
+  }
+
+  value.module = id;
+
   try {
-    const { id } = await Module.findOne({ slug_title: req.params.title });
-
-    req.body.module = id;
-
-    const lesson = await Lesson.create(req.body);
+    const lesson = await Lesson.create(value);
 
     //if the lesson is created, retrieve the id and update the parent course
     await Module.findByIdAndUpdate(id, {

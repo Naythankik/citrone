@@ -33,6 +33,7 @@ router
   .route("/:level/course")
   .get(getALevelModules)
   .post(authorization, createAModule);
+
 router.route("/:level/course/:title").get(getModule).post(createLesson);
 router.route("/:level/course/:title/quiz").get(getQuiz).post(postQuiz);
 
