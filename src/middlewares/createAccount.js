@@ -92,7 +92,7 @@ const verifySignUpMail = async (req, res) => {
         .send({ message: "email verification failed, sign up again" });
     }
 
-    await User.findByIdAndUpdate(verifyToken.userId, { status: "approved" });
+    await User.findByIdAndUpdate(verifyToken.userId, { status: "approved" }); //update the registrationToken field to undefined
     res
       .status(StatusCodes.OK)
       .send({ message: "account creation successfully kindly go login" });
