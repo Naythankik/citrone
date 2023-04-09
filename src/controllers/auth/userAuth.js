@@ -9,11 +9,21 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES;
 
 const { signUpSchema, loginSchema } = require("../../utils/joiSchema");
 const { doesUserExist, generateUsername } = require("../../utils");
-const { request } = require("http");
 
 /**user login controller */
 const userLogin = async (req, res) => {
   // Check if a user is active at the moment on the device
+
+   /**Validate the data in the req.body */
+   const validation = loginSchema(req.body);
+
+   const { error, value } = validation;
+   if (error) {
+     return res
+       .status(StatusCodes.UNPROCESSABLE_ENTITY)
+       .json({ message: error.details[0].message });
+   }
+   //check if no user is signed in on the device at the moment
   const { token } = req.cookies;
 
   if (token) {
@@ -23,15 +33,7 @@ const userLogin = async (req, res) => {
     return;
   }
 
-  /**Validate the data in the req.body */
-  const validation = loginSchema(req.body);
-
-  const { error, value } = validation;
-  if (error) {
-    return res
-      .status(StatusCodes.UNPROCESSABLE_ENTITY)
-      .json({ message: error.details[0].message });
-  }
+ 
   try {
     /**find a user with the provided email and check if the email and password matched */
     const { email, password } = value;

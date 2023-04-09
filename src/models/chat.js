@@ -16,7 +16,7 @@ const ChatSchema = new mongoose.Schema(
       required: [true, "receiverId is required"],
     },
     read: {
-        type: boolean,
+        type: Boolean,
         default: false,
     }
   },
