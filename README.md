@@ -28,3 +28,10 @@
 ### Password Reset
 - Reset Password : POST : [/api/citrone/resetPassword/:token](/api/citrone/resetPassword/:token)
     - input text : [password,confirmPassword] 
+    
+    
+    
+### Authenticated Routes
+- Get a all levels of courses : GET : [/api/citrone/user/courses](/api/citrone/user/courses)
+- Post a levels of course : POST : [/api/citrone/user/courses](/api/citrone/user/courses)
+    - can only be accesed by the admin alone
