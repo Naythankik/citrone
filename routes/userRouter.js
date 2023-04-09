@@ -8,7 +8,11 @@ const {
   postCourseLevel,
 } = require("../src/controllers/moduleController");
 
-const { getQuiz, postQuiz } = require("../src/controllers/quizController");
+const {
+  getQuiz,
+  postQuiz,
+  updateQuiz,
+} = require("../src/controllers/quizController");
 
 const {
   getUserAccount,
@@ -34,7 +38,16 @@ router
   .get(getALevelModules)
   .post(authorization, createAModule);
 
-router.route("/:level/course/:title").get(getModule).post(createLesson);
-router.route("/:level/course/:title/quiz").get(getQuiz).post(postQuiz);
+//routes for getting a module and creating a lesson for the module
+router
+  .route("/:level/course/:title")
+  .get(getModule)
+  .post(authorization, createLesson);
+
+router
+  .route("/:level/course/:title/quiz")
+  .get(getQuiz)
+  .post(authorization, postQuiz)
+  .put(authorization, updateQuiz);
 
 module.exports = router;
