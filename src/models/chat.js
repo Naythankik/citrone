@@ -15,6 +15,10 @@ const ChatSchema = new mongoose.Schema(
       ref: "user",
       required: [true, "receiverId is required"],
     },
+    read: {
+        type: boolean,
+        default: false,
+    }
   },
   { timestamps: true }
 );
