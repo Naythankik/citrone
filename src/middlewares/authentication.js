@@ -2,10 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 const authentication = async (req, res, next) => {
-  const {token} = req.cookies;
-  // req.body.token ||
-  // req.query.token ||
-  // req.headers.authorization.split(" ")[1];
+  const { token } = req.cookies;
 
   if (!token) {
     res.status(403).send({ message: "no token found, Login" });
@@ -16,20 +13,6 @@ const authentication = async (req, res, next) => {
       throw new Error(err);
     }
     return next();
-  }
-};
-
-const authorization = async (req, res, next) => {
-  try {
-    const { id } = req.user;
-    const admin = await User.findById(id);
-    if (admin.role !== "admin") {
-      throw new Error({ error: "User is not an admin" });
-    } else {
-      next();
-    }
-  } catch (error) {
-    throw new Error(error);
   }
 };
 

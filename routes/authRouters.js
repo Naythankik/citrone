@@ -25,8 +25,4 @@ router.get("/logout", authentication, userLogout);
 //create account (signUp) endpoint
 router.route("/").post(createAccount, generateSignUpMail);
 
-// router.get("/email/verify/:token", verifySignUpMail)
-
-// router.post("/deactivate", authentication, deactivateAUser);
-
 module.exports = router;
