@@ -38,4 +38,4 @@
 - get a module under a level or course : GET : [/api/citrone/user/:level/course](/api/citrone/user/:level/course)
 - create a module under a level or course : POST : [/api/citrone/user/:level/course](/api/citrone/user/:level/course)
     - can only be accessed by the admin alone.
-    - the "-:level-" e.g beginner, intermediate, tertiary
+    - the __:level__ e.g beginner, intermediate, tertiary
