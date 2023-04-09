@@ -37,24 +37,27 @@ const postCourseLevel = async (req, res) => {
 };
 
 //when a user wants to access all modules for a specified level
-const getALevel = async (req, res) => {
+const getALevelModules = async (req, res) => {
   const { level } = req.params;
 
   //retrieve the id of the level from the request
-  const { id } = await Course.findOne({ level });
-
-  //find all the courses of under the level via the id retrieved above
   try {
-    const courses = await Module.find({ course: id }).select(["-lesson"]);
+    const { id } = await Course.findOne({ level });
 
-    // if course returns null
-    if (!courses) {
-      res.status(400).send({ error: "no course is found" });
-      return;
+    //find all the courses of under the level via the id retrieved above
+    try {
+      const courses = await Module.find({ course: id }).select(["-lesson"]);
+
+      // if course returns null
+      if (!courses) {
+        res.status(400).send({ error: "no course is found" });
+        return;
+      }
+
+      res.send({ message: courses });
+    } catch (error) {
+      throw new Error(error);
     }
-
-    res.send({ message: courses });
-    return;
     return;
   } catch (error) {
     throw new Error(error);
@@ -67,14 +70,30 @@ const createAModule = async (req, res) => {
   //find the level of the course from the document
   const { id } = await Course.findOne({ level });
 
+  //create a validation to get the value and error of the details submitted by the admin
+  const moduleValidation = Joi.object({
+    module: Joi.string().required(),
+    title: Joi.string().lowercase().required(),
+    description: Joi.string().lowercase().required(),
+    objectives: Joi.string().lowercase().required(),
+  });
+
+  const { error, value } = moduleValidation.validate(req.body);
+
+  // if error is true, send a response to the admin
+  if (error) {
+    res.status(400).send({ message: error.details[0].message });
+    return;
+  }
+
   //create a slug of the title
-  req.body.slug_title = slugify(req.body.title, "_");
-  req.body.course = id;
+  value.slug_title = slugify(req.body.title, "_");
+  value.course = id;
 
   try {
-    const module = await Module.create(req.body);
+    const module = await Module.create(value);
 
-    // if the module is created, add the id to the course module
+    // if the module is created, add the id to the course or level module
     await Course.findOneAndUpdate(
       { level: level },
       { $addToSet: { module: module.id } }
@@ -127,7 +146,7 @@ const createLesson = async (req, res) => {
 module.exports = {
   getCoursesLevel,
   postCourseLevel,
-  getALevel,
+  getALevelModules,
   createAModule,
   getModule,
   createLesson,
