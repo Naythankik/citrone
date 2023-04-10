@@ -1,5 +1,9 @@
 const express = require("express");
 const {
+  getAllAssignments,
+  createAssignment,
+} = require("../src/controllers/assignmentController");
+const {
   getCoursesLevel,
   getALevelModules,
   getModule,
@@ -25,6 +29,14 @@ const router = express.Router();
 
 router.route("/").get(getUserAccount).put(updateUserProfile);
 
+// routes for assigment
+router.route("/assignment").get(getAllAssignments);
+router.post(
+  "/:level/course/:title/assignment",
+  authorization,
+  createAssignment
+);
+
 // routes for the courses, modules, lessons and quizzes
 // routes for getting and setting the courses level
 router
@@ -44,6 +56,7 @@ router
   .get(getModule)
   .post(authorization, createLesson);
 
+//routes for quiz
 router
   .route("/:level/course/:title/quiz")
   .get(getQuiz)

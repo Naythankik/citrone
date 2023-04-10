@@ -6,24 +6,23 @@ const Module = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "course",
     },
-
     module: {
       type: String,
-      required: [true, 'what module is this?'],
+      required: [true, "what module is this?"],
     },
     title: {
       type: String,
-      required: [true, 'please provide the module title'],
+      required: [true, "please provide the module title"],
       unique: true,
     },
     slug_title: String,
     description: {
       type: String,
-      required: [true, 'please provide the module description'],
+      required: [true, "please provide the module description"],
     },
     objectives: {
       type: Array,
-      required: [true, 'please provide the module objectives'],
+      required: [true, "please provide the module objectives"],
     },
     lesson: [
       {

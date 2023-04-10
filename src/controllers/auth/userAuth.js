@@ -14,18 +14,17 @@ const { doesUserExist, generateUsername } = require("../../utils");
 const userLogin = async (req, res) => {
   // Check if a user is active at the moment on the device
 
-   /**Validate the data in the req.body */
-   const validation = loginSchema(req.body);
+  /**Validate the data in the req.body */
+  const validation = loginSchema(req.body);
 
-   const { error, value } = validation;
-   if (error) {
-     return res
-       .status(StatusCodes.UNPROCESSABLE_ENTITY)
-       .json({ message: error.details[0].message });
-   }
-   //check if no user is signed in on the device at the moment
+  const { error, value } = validation;
+  if (error) {
+    return res
+      .status(StatusCodes.UNPROCESSABLE_ENTITY)
+      .json({ message: error.details[0].message });
+  }
+  //check if no user is signed in on the device at the moment
   const { token } = req.cookies;
-   console.log({token})
   if (token) {
     res
       .status(400)
@@ -33,7 +32,6 @@ const userLogin = async (req, res) => {
     return;
   }
 
- 
   try {
     /**find a user with the provided email and check if the email and password matched */
     const { email, password } = value;

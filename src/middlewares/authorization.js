@@ -2,7 +2,7 @@ const { User } = require("../models");
 
 const authorization = async (req, res, next) => {
   try {
-    const { userId } = req.user;
+    const { userId } = req.payload;
 
     //fetch active user details from document and check if the user is an admin
     const user = await User.findById(userId);

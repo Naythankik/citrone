@@ -1,4 +1,4 @@
-const { Module, Lesson, Course } = require("../models");
+const { Module, Lesson, Course, Assignment } = require("../models");
 const slugify = require("slugify");
 const Joi = require("joi");
 
