@@ -11,6 +11,7 @@ const createChat = async (req, res, next) => {
      * two users will be returned back to the sender */ 
     // later the code will be modified that the userId will be
     // gotten from the user payload instead from the client
+    const {userId} = req.payload;
   try {
     const validation = chatSchema(req.body);
     const { value, error } = validation;

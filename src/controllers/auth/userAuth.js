@@ -29,7 +29,7 @@ const userLogin = async (req, res) => {
   if (token) {
     res
       .status(400)
-      .send({ message: "A user is active at the moment on this device" });
+      .send({ message: "A user is active on this device at the moment" });
     return;
   }
 
@@ -94,10 +94,7 @@ const userLogout = async (req, res) => {
     httpOnly: true,
     secure: true,
   });
-  // res.cookie("token", "logout", {
-  //   httpOnly: true,
-  //   expires: new Date(Date.now() + 1000),
-  // });
+
   res.status(StatusCodes.OK).json({ message: "user logged out" });
 };
 

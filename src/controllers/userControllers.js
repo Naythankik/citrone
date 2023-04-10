@@ -4,7 +4,7 @@ const { User } = require("../models");
 require("dotenv").config();
 
 const getUserAccount = async (req, res) => {
-  const { userId } = req.user;
+  const { userId } = req.payload;
 
   try {
     const user = await User.findById(userId);
@@ -20,7 +20,7 @@ const getUserAccount = async (req, res) => {
 
 const updateUserProfile = async (req, res) => {
   //use the authentication to receive user details from the payload saved to jwt
-  const { userId } = req.user;
+  const { userId } = req.payload;
 
   //check if the req has role key
   if (req.body.role) {
