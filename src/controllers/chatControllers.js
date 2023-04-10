@@ -28,8 +28,8 @@ const createChat = async (req, res, next) => {
      * the sender is either the receiver or sender */
     const chatBetweenTheUsers = await Chat.find({
       $or: [
-        { sender: sender, receiver: receiver },
-        { sender: receiver, receiver: sender },
+        { sender: userId, receiver: receiver },
+        { sender: receiver, receiver: userId },
       ],
 
     }).sort({ createdAt: -1 }); // sort by created time
