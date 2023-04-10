@@ -6,9 +6,7 @@ const {
   userLogout,
 } = require("../src/controllers/auth");
 const { authentication } = require("../src/middlewares/authentication");
-const {
-  generateSignUpMail,
-} = require("../src/middlewares/createAccount");
+const { generateSignUpMail } = require("../src/middlewares/createAccount");
 
 const router = express.Router();
 
