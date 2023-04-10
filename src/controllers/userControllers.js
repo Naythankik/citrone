@@ -1,10 +1,10 @@
 const { StatusCodes } = require("http-status-codes");
 const crypto = require("crypto");
 const { User } = require("../models");
-require("dotenv").config();
+require("dotenv").config();   
 
 const getUserAccount = async (req, res) => {
-  const { userId } = req.user;
+  const { userId } = req.payload;
 
   try {
     const user = await User.findById(userId);
@@ -20,12 +20,12 @@ const getUserAccount = async (req, res) => {
 
 const updateUserProfile = async (req, res) => {
   //use the authentication to receive user details from the payload saved to jwt
-  const { userId } = req.user;
+  const { userId } = req.payload;
 
   //check if the req has role key
   if (req.body.role) {
     if (req.body.role !== "learner") {
-      res.status(401).send({ message: "User has no access to admin" });
+      res.status(StatusCodes.UNAUTHORIZED).send({ message: "User has no access to admin" });
       return;
     }
   }
@@ -33,7 +33,7 @@ const updateUserProfile = async (req, res) => {
   if (req.body.password) {
     //if password is submitted by the user
     res
-      .status(401)
+      .status(StatusCodes.UNAUTHORIZED)
       .send({ message: "User can't change password via this endpoint" });
     return;
   }

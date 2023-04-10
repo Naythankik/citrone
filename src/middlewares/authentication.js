@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
 
 const authentication = async (req, res, next) => {
   const { token } = req.cookies;
@@ -8,11 +7,12 @@ const authentication = async (req, res, next) => {
     res.status(403).send({ message: "no token found, Login" });
   } else {
     try {
-      req.user = jwt.verify(token, process.env.JWT_SECRET);
+      req.payload = jwt.verify(token, process.env.JWT_SECRET);
+      return next();
     } catch (err) {
-      throw new Error(err);
+      res.status(500).send(err.message); 
     }
-    return next();
+    
   }
 };
 

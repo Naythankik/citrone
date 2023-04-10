@@ -5,6 +5,8 @@ const cookieParser = require("cookie-parser");
 const connection = require("./config/dbConnection");
 const userRouter = require("./routes/userRouter");
 const { authRouter } = require("./routes/index");
+const chatRouter = require("./routes/chatRouters");
+
 const { resetPassword } = require("./src/controllers/userControllers");
 const { verifySignUpMail } = require("./src/middlewares/createAccount");
 const { authentication } = require("./src/middlewares/authentication");
@@ -33,12 +35,14 @@ app.get("/api/citrone/email/verify/:token", verifySignUpMail);
 
 app.post("/api/citrone/resetPassword/:token", resetPassword);
 app.use("/api/citrone/auth", authRouter);
+app.use("/api/citrone/chat", chatRouter);
 app.use("/api/citrone/user", authentication, userRouter);
 
 //default routes
 app.use(["/", "/api/citrone"], (req, res) => {
   res.status(400).json({ message: "Welcome to Citrone" });
 });
+
 app.listen(PORT, () => {
   console.log(`App is running on ${PORT}`);
 });

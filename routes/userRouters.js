@@ -11,6 +11,5 @@ router
   .route("/")
   .get(authentication, getUserAccount)
   .put(authentication, updateUserProfile);
-// router.post("/deactivate", authentication, deactivateAUser);
 
 module.exports = router;
