@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const crypto = require("crypto");
 const { User } = require("../models");
-require("dotenv").config();
+require("dotenv").config();   
 
 const getUserAccount = async (req, res) => {
   const { userId } = req.payload;

@@ -25,7 +25,7 @@ const userLogin = async (req, res) => {
    }
    //check if no user is signed in on the device at the moment
   const { token } = req.cookies;
-
+   console.log({token})
   if (token) {
     res
       .status(400)

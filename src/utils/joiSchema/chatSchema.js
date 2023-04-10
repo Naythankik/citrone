@@ -5,7 +5,7 @@ function chatSchema(data) {
     sender: Joi.string().required(),
     receiver: Joi.string().required(),
     text: Joi.string().min(1).max(400).required(),
-  });
+  }); 
   return schema.validate(data);
 }
 

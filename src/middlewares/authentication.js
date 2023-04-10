@@ -8,10 +8,11 @@ const authentication = async (req, res, next) => {
   } else {
     try {
       req.payload = jwt.verify(token, process.env.JWT_SECRET);
+      return next();
     } catch (err) {
-      throw new Error(err);
+      res.status(500).send(err.message); 
     }
-    return next();
+    
   }
 };
 
