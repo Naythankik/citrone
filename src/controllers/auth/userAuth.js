@@ -68,7 +68,7 @@ const userLogin = async (req, res) => {
     const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
     res.cookie("token", token, {
       httpOnly: true,
-      expires: new Date(Date.now() + JWT_EXPIRES + 1000),
+      expires: new Date(Date.now() + (30 * 60 * 1000)) // 30 minutes from now,
     });
 
     user.isActive = true; //the user is active (i.e online until he logout)

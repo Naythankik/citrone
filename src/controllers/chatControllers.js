@@ -47,6 +47,40 @@ const getAllChatsOfAUser = async (req, res, next) => {
     $or: [{ sender: userId }, { receiver: userId }],
   });
 };
+
+const getAllChatsWithOtherUsers = async (req, res, next) => {
+    const { userId } = req.payload;
+  
+    // Find all chats where the user is either the sender or receiver
+    const allChats = await Chat.find({
+      $or: [{ sender: userId }, { receiver: userId }],
+    }).sort({ createdAt: 1 });
+  
+    // Group the chats by the other user's ID
+    const chatsByUser = allChats.reduce((accumulator, chat) => {
+      // Get the ID of the other user in the chat
+      const otherUserId = chat.sender.toString() === userId ? chat.receiver : chat.sender;
+  
+      // If the other user already has a group of chats, add the current chat to that group
+      if (accumulator[otherUserId]) {
+        accumulator[otherUserId].push(chat);
+      }
+      // If the other user doesn't have a group of chats yet, create a new group with the current chat
+      else {
+        accumulator[otherUserId] = [chat];
+      }
+  
+      return accumulator;
+    }, {});
+  
+    // Sort each group of chats by date
+    Object.keys(chatsByUser).forEach((userId) => {
+      chatsByUser[userId].sort((a, b) => a.createdAt - b.createdAt);
+    });
+  
+    res.status(StatusCodes.OK).json({ data: chatsByUser });
+  };
+
 const getUserChatsWithAnotherUser = async (req, res, next) => {
     try{
         const { userId } = req.payload;
