@@ -23,14 +23,6 @@ const userLogin = async (req, res) => {
       .status(StatusCodes.UNPROCESSABLE_ENTITY)
       .json({ message: error.details[0].message });
   }
-  //check if no user is signed in on the device at the moment
-  const { token } = req.cookies;
-  if (token) {
-    res
-      .status(400)
-      .send({ message: "A user is active on this device at the moment" });
-    return;
-  }
 
   try {
     /**find a user with the provided email and check if the email and password matched */
@@ -54,14 +46,29 @@ const userLogin = async (req, res) => {
       res.status(401).send({ message: "user account has not been verified" });
       return;
     }
-
-    /**Attaching payload to cookie */
+    /*check if a user is signed in on the device(the browser) at the moment and logout the user */
+    const existingToken = req.cookies.token;
+    if (existingToken) {
+      const decodedToken = jwt.verify(existingToken, jwtSecret);
+      /**if the new user is different from the currently login user */
+      if (decodedToken.userId !== user._id)
+        res.clearCookie("token", {
+          httpOnly: true,
+          secure: true,
+        });
+      // update the current login user isActive status to false
+      await User.findByIdAndUpdate(decodedToken.userId, {
+        $set: {
+          isActive: false,
+        },
+      });
+    }
+    /**Attaching payload to cookie * and allow it to clear automatically after expiration*/
     const payload = generatePayload(user);
-
     const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
     res.cookie("token", token, {
       httpOnly: true,
-      expiresIn: new Date(Date.now() + JWT_EXPIRES),
+      expires: new Date(Date.now() + JWT_EXPIRES + 1000),
     });
 
     user.isActive = true; //the user is active (i.e online until he logout)
