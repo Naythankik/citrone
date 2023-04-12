@@ -73,8 +73,14 @@ const submitAssignment = async (req, res) => {
     for (let learner of assignment.submissions) {
       //check for the id of the user
       if (learner.user == userId) {
-        //send a forbidden response to the user
-        res.status(403).send({ error: "can't make another submission" });
+        //the re-submit button is sent,update the user assigment
+        learner.answer = value.answer;
+
+        await assignment.save();
+
+        res
+          .status(200)
+          .send({ message: "assignment has been re-submitted successfully" });
         return;
       }
     }
@@ -84,7 +90,7 @@ const submitAssignment = async (req, res) => {
       $addToSet: {
         submissions: {
           user: userId,
-          answer: value.answer,
+          value,
         },
       },
     });
@@ -97,7 +103,7 @@ const submitAssignment = async (req, res) => {
     });
 
     //then send a 200 status to the user
-    res.status(200).send({ message: "assignment submitted succesfully" });
+    res.status(200).send({ message: "assignment submitted successfully" });
   } catch (error) {
     res.status(400).send({ error: error.message });
   }
