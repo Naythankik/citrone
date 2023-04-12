@@ -2,6 +2,7 @@ const express = require("express");
 const {
   getAllAssignments,
   createAssignment,
+  updateAssignment,
 } = require("../src/controllers/assignmentController");
 const {
   getCoursesLevel,
@@ -31,6 +32,10 @@ router.route("/").get(getUserAccount).put(updateUserProfile);
 
 // routes for assigment
 router.route("/assignment").get(getAllAssignments);
+
+//update the asssignment by the id
+router.put("/assignment/:id", authorization, updateAssignment);
+
 router.post(
   "/:level/course/:title/assignment",
   authorization,

@@ -4,7 +4,10 @@ const { Assignment, Module } = require("../models");
 const getAllAssignments = async (req, res) => {
   try {
     // fetch all assigments from the collection
-    const assignment = await Assignment.find().populate("module");
+    const assignment = await Assignment.find().populate({
+      path: "module",
+      // populate: { path: "lesson" },
+    });
 
     res.status(200).send({ assignment });
   } catch (error) {
@@ -36,7 +39,8 @@ const createAssignment = async (req, res) => {
       return;
     }
 
-    //check if the assigment exist
+    //check if the assigment exist,
+    //a module can have only one assignment
     const assignmentExist = await Assignment.findOne({ module: id });
 
     if (assignmentExist) {
@@ -61,7 +65,30 @@ const createAssignment = async (req, res) => {
   return;
 };
 
+const updateAssignment = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const assignment = await Assignment.findByIdAndUpdate(id, req.body);
+
+    // if it returns null
+    if (!assignment) {
+      res.status(400).send({ error: "assigment not found" });
+      return;
+    }
+
+    //return a success response to the user
+    res
+      .status(200)
+      .send({ message: "assignment has been updated", data: assignment });
+  } catch (error) {
+    throw new Error(error);
+  }
+  return;
+};
+
 module.exports = {
   getAllAssignments,
   createAssignment,
+  updateAssignment,
 };
