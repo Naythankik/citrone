@@ -43,9 +43,26 @@ const createChat = async (req, res, next) => {
 //This route will be executed whenever a user hit the chat page
 const getAllChatsOfAUser = async (req, res, next) => {
   const { userId } = req.payload;
+
+  /**Get all chats where the user is a participant sorted by date*/
   const allChats = await Chat.find({
     $or: [{ sender: userId }, { receiver: userId }],
-  });
+  }).sort({createdAt: -1});
+
+  const sortedChats = []; //the finally sorted chats array will be returned to the caller
+/**loop through the chats and separate chat he has with different users */
+  for (let i = 0; i < allChats.length; i++) {
+    
+    let chat = allChats[i]; //a particular chat object from allChats array(array of chat objects)
+    let { receiver, sender } = chat; 
+
+//the chat with the partner here will be added to the chat will the partner
+    let chatWithPartner = allChats.filter(
+      (chat) =>
+        (chat.sender === sender && chat.receiver === receiver) ||
+        (chat.sender === receiver && chat.sender === receiver)
+    );
+  }
 };
 
 const getAllChatsWithOtherUsers = async (req, res, next) => {
