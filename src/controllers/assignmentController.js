@@ -16,6 +16,28 @@ const getAllAssignments = async (req, res) => {
   return;
 };
 
+const getAnAssignment = async (req, res) => {
+  // destructure the parameters from the request and fetch the id
+  const { id } = req.params;
+
+  // use the id to fetch the details of the document
+  try {
+    const assignment = await Assignment.findById(id).select(["-module"]);
+
+    // if it fails, send an error to the user
+    if (!assignment) {
+      res.status(400).send({ error: "assignment not found" });
+      return;
+    }
+
+    //send the success response to the user
+    res.status(200).send({ assignment });
+  } catch (error) {
+    throw new Error(error);
+  }
+  return;
+};
+
 const createAssignment = async (req, res) => {
   try {
     const { title } = req.params;
@@ -66,12 +88,14 @@ const createAssignment = async (req, res) => {
 };
 
 const updateAssignment = async (req, res) => {
+  // destructure the parameters from the request and fetch the id
   const { id } = req.params;
 
   try {
+    //find the document using the id and update
     const assignment = await Assignment.findByIdAndUpdate(id, req.body);
 
-    // if it returns null
+    // if it returns null, send a failed response to the user
     if (!assignment) {
       res.status(400).send({ error: "assigment not found" });
       return;
@@ -88,12 +112,14 @@ const updateAssignment = async (req, res) => {
 };
 
 const deleteAssignment = async (req, res) => {
+  // destructure the parameters from the request and fetch the id
   const { id } = req.params;
 
   try {
+    //find the document using the id and delete
     const assignment = await Assignment.findByIdAndDelete(id);
 
-    // if it returns null
+    // if it returns null, send a failed response to the user
     if (!assignment) {
       res.status(400).send({ error: "assigment not found" });
       return;
@@ -109,6 +135,7 @@ const deleteAssignment = async (req, res) => {
 
 module.exports = {
   getAllAssignments,
+  getAnAssignment,
   createAssignment,
   updateAssignment,
   deleteAssignment,

@@ -4,6 +4,7 @@ const {
   createAssignment,
   updateAssignment,
   deleteAssignment,
+  getAnAssignment,
 } = require("../src/controllers/assignmentController");
 const {
   getCoursesLevel,
@@ -37,6 +38,7 @@ router.route("/assignment").get(getAllAssignments);
 //update the asssignment by the id
 router
   .route("/assignment/:id", authorization)
+  .get(getAnAssignment)
   .put(updateAssignment)
   .delete(deleteAssignment);
 
