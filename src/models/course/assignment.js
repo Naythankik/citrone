@@ -35,6 +35,10 @@ const AssignmentSchema = new mongoose.Schema(
         },
         answer: String,
         grade: Number,
+        mail: {
+          type: Boolean,
+          default: false,
+        },
       },
     ],
   },

@@ -1,4 +1,5 @@
 const Joi = require("joi");
+
 const { Assignment, Module, User } = require("../models");
 
 const getAllAssignments = async (req, res) => {
@@ -48,6 +49,7 @@ const submitAssignment = async (req, res) => {
   //validate the request form from the user
   const submissionValidation = Joi.object({
     answer: Joi.string().required(),
+    mail: Joi.boolean(),
   });
 
   const { error, value } = submissionValidation.validate(req.body);
@@ -90,7 +92,8 @@ const submitAssignment = async (req, res) => {
       $addToSet: {
         submissions: {
           user: userId,
-          value,
+          answer: value.answer,
+          mail: value.mail,
         },
       },
     });
