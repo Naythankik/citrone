@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { Assignment, Module } = require("../models");
+const { Assignment, Module, User } = require("../models");
 
 const getAllAssignments = async (req, res) => {
   try {
@@ -34,6 +34,72 @@ const getAnAssignment = async (req, res) => {
     res.status(200).send({ assignment });
   } catch (error) {
     throw new Error(error);
+  }
+  return;
+};
+
+const submitAssignment = async (req, res) => {
+  // fetch the user id from the payload
+  const { userId } = req.payload;
+
+  // destructure the parameters from the request and fetch the id
+  const { id } = req.params;
+
+  //validate the request form from the user
+  const submissionValidation = Joi.object({
+    answer: Joi.string().required(),
+  });
+
+  const { error, value } = submissionValidation.validate(req.body);
+
+  //if error is true, return a 400 status to the user
+  if (error) {
+    res.status(400).send({ error: error.details[0].message });
+    return;
+  }
+
+  try {
+    //find the assignment document from the collection
+    const assignment = await Assignment.findById(id);
+
+    //check if the assignment is still up for submission
+    // if false , send a 400 status to the user
+    if (assignment.dueDate < Date.now()) {
+      res.status(400).send({ error: "assignment is obsolete" });
+      return;
+    }
+
+    //check if the user have submitted
+    for (let learner of assignment.submissions) {
+      //check for the id of the user
+      if (learner.user == userId) {
+        //send a forbidden response to the user
+        res.status(403).send({ error: "can't make another submission" });
+        return;
+      }
+    }
+
+    //if true, append the answer to the document
+    await Assignment.findByIdAndUpdate(id, {
+      $addToSet: {
+        submissions: {
+          user: userId,
+          answer: value.answer,
+        },
+      },
+    });
+
+    // if the submission is successful, update the user document
+    await User.findByIdAndUpdate(userId, {
+      $addToSet: {
+        assignment: id,
+      },
+    });
+
+    //then send a 200 status to the user
+    res.status(200).send({ message: "assignment submitted succesfully" });
+  } catch (error) {
+    res.status(400).send({ error: error.message });
   }
   return;
 };
@@ -136,6 +202,7 @@ const deleteAssignment = async (req, res) => {
 module.exports = {
   getAllAssignments,
   getAnAssignment,
+  submitAssignment,
   createAssignment,
   updateAssignment,
   deleteAssignment,

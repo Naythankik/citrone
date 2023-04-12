@@ -5,6 +5,7 @@ const {
   updateAssignment,
   deleteAssignment,
   getAnAssignment,
+  submitAssignment,
 } = require("../src/controllers/assignmentController");
 const {
   getCoursesLevel,
@@ -42,6 +43,9 @@ router
   .put(updateAssignment)
   .delete(deleteAssignment);
 
+router.post("/assignment/:id", submitAssignment);
+
+//create an assignment for a specific module
 router.post(
   "/:level/course/:title/assignment",
   authorization,

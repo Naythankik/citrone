@@ -55,6 +55,12 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "lesson",
     },
+    assignment: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "assignment",
+      },
+    ],
     passwordResetToken: String,
     forgetPasswordExpires: Date,
     registrationToken: String,
