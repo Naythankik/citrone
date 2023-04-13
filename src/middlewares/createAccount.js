@@ -92,15 +92,18 @@ const verifySignUpMail = async (req, res) => {
         .send({ message: "email verification failed, sign up again" });
     }
 
-    await User.findByIdAndUpdate(verifyToken.userId, {
-      status: "approved",
-      registrationToken: undefined,
-    });
+    await User.findOneAndUpdate(
+      { registrationToken: token },
+      {
+        registrationToken: "",
+        status: "approved",
+      }
+    );
     //update the registrationToken field to undefined
 
-    res
-      .status(StatusCodes.OK)
-      .send({ message: "account creation successfully kindly go login" });
+    res.status(StatusCodes.OK).send({
+      message: "account verification successful! \n\t kindly go login",
+    });
   } catch (err) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)

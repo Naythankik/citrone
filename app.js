@@ -40,7 +40,11 @@ app.use("/api/citrone/user", authentication, userRouter);
 
 //default routes
 app.use(["/", "/api/citrone"], (req, res) => {
-  res.status(400).json({ message: "Welcome to Citrone" });
+  res.status(404).json({
+    success: false,
+    message: "API endpoint doesnt exist",
+  });
+  return;
 });
 
 app.listen(PORT, () => {
