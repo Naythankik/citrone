@@ -11,4 +11,4 @@ function signUpSchema(data) {
   return schema.validate(data);
 }
 
-module.exports =  signUpSchema ;
+module.exports = signUpSchema;
