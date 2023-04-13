@@ -47,8 +47,6 @@ app.use(["/", "/api/citrone"], (req, res) => {
   return;
 });
 
-//testing the wokr
-
 app.listen(PORT, () => {
   console.log(`App is running on ${PORT}`);
 });
