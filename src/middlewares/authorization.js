@@ -8,7 +8,7 @@ const authorization = async (req, res, next) => {
     const user = await User.findById(userId);
 
     if (user.role !== "admin") {
-      res.status(401).send({ error: "you're not an admin" });
+      res.status(401).send({ success: false, error: "you're not an admin" });
       return;
     }
     next();
