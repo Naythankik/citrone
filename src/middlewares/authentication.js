@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { mail, generatePayload } = require("../utils/");
 
 const authentication = async (req, res, next) => {
   const { token } = req.cookies;
