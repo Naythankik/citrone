@@ -1,6 +1,8 @@
 const Joi = require("joi");
 
 const { Assignment, Module, User } = require("../models");
+const assignment = require("../models/course/assignment");
+const { mail } = require("../utils");
 
 const getAllAssignments = async (req, res) => {
   try {
@@ -67,7 +69,7 @@ const submitAssignment = async (req, res) => {
     //check if the assignment is still up for submission
     // if false , send a 400 status to the user
     if (assignment.dueDate < Date.now()) {
-      res.status(400).send({ error: "assignment is obsolete" });
+      res.status(400).send({ succes: false, error: "assignment is obsolete" });
       return;
     }
 
@@ -208,6 +210,121 @@ const deleteAssignment = async (req, res) => {
   return;
 };
 
+// grading the assignment by the tutor
+const getSubmission = async (req, res) => {
+  // fetch the assignemnt Id from the request sent
+  const { id } = req.params;
+
+  try {
+    //find the document of assignment
+    const assignment = await Assignment.findById(id).select(["submissions"]);
+
+    // return only the submission field to the admin
+    res.status(200).send(assignment);
+  } catch (error) {
+    res.status(402).send({ success: false, error: error.message });
+  }
+  return;
+};
+
+const getAUserSubmission = async (req, res) => {
+  //destruct the request from the incoming endpoint
+  const { id, userId } = req.params;
+  try {
+    // fetch the assignment document
+    const assignment = await Assignment.findById(id);
+
+    // assigng the submissions field to a constant
+    const submission = assignment.submissions;
+
+    // find the user specified in the submission array,
+    // the return the object of the submission
+    submission.find((user) => {
+      if (user.user == userId) {
+        res.status(200).send(user);
+      }
+    });
+  } catch (error) {
+    res.status(403).send({ success: false, error: error.mesaage });
+  }
+  return;
+};
+
+const gradeAUserSubmission = async (req, res) => {
+  //destruct the request from the incoming endpoint
+  const { id, userId } = req.params;
+
+  const learner = await User.findById(userId);
+
+  try {
+    // fetch the assignment document
+    const assignment = await Assignment.findById(id);
+
+    //  validate the grade coming from the admin
+    const gradeValidation = Joi.object({
+      grade: Joi.number().min(1).max(100).required(),
+    });
+
+    // destruct the validation of the request sent by the admin
+    const { error, value } = gradeValidation.validate(req.body);
+
+    //check if there is error,
+    //if error , returns a cient error back to the admin
+    if (error) {
+      res.status(400).send({ succes: false, error: error.details[0].message });
+    }
+
+    // assigng the submissions field to a constant
+    const submission = assignment.submissions;
+
+    try {
+      // find the user specified in the submission array,
+      // the return the object of the submission
+      submission.filter(async (user) => {
+        if (user.user == userId) {
+          //update the learner grade
+          const { modifiedCount } = await Assignment.updateOne(
+            { id: id, "submissions.user": userId },
+            {
+              $set: { "submissions.$.grade": value.grade },
+            }
+          );
+
+          if (modifiedCount) {
+            // check if the user subscribes to mail when graded
+            if (user.mail) {
+              // send mail to the user else do nothing
+
+              const data = {
+                to: learner.email,
+                subject: "Assignment Grading",
+                text: "You are receiving this mail cause you turn the notification",
+                html: `<a href="afaffkgvh">The link to see the grade of the assignment</a>`,
+              };
+
+              // send the mail to the learner
+              mail(data);
+            }
+          }
+        }
+      });
+
+      // return a response 200 to the admin
+      res.status(200).send({
+        success: true,
+        message: "assignment has been graded sucessfully",
+      });
+      return;
+    } catch (error) {
+      res.status(400).send({ success: false, error: error.message });
+      return;
+    }
+  } catch (error) {
+    res.status(403).send({ success: false, error: error.mesaage });
+    return;
+  }
+};
+
 module.exports = {
   getAllAssignments,
   getAnAssignment,
@@ -215,4 +332,7 @@ module.exports = {
   createAssignment,
   updateAssignment,
   deleteAssignment,
+  getSubmission,
+  getAUserSubmission,
+  gradeAUserSubmission,
 };
