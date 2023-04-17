@@ -8,17 +8,16 @@ const authentication = async (req, res, next) => {
     res.status(403).send({ message: "no token found, Login" });
   } else {
     try {
-      req.payload = jwt.verify(token, process.env.JWT_SECRET);
-
+      const payload = jwt.verify(token, process.env.JWT_SECRET);
+      req.payload = payload
       const now = Date.now().valueOf() / 1000;
       if (payload.exp - now < 300) {
         // if the token expires in less than 5 minutes
         // Refresh the token and send it to the client
         await res.clearCookie("token", {
           httpOnly: true,
-          secure: true,
+          secure: true, 
         });
-
         //generate new token
         const payload = generatePayload(user);
         /**Attaching payload to cookie * and allow it to clear automatically after expiration*/

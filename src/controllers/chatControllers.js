@@ -15,13 +15,15 @@ const createChat = async (req, res, next) => {
   try {
     const validation = chatSchema(req.body);
     const { value, error } = validation;
+    console.log({value})
     if (error) {
       res
         .status(StatusCodes.UNPROCESSABLE_ENTITY)
         .send(validation.error.details[0].message);
       return;
     }
-    const { sender, receiver } = value;
+    const {receiver } = value;
+    value.sender = userId
     // add the new message to the database
     await Chat.create({ ...value });
     /**find all the chats between the two users where
@@ -41,74 +43,85 @@ const createChat = async (req, res, next) => {
 };
 
 // //This route will be executed whenever a user hit the chat page
-// const getAllChatsOfAUser = async (req, res, next) => {
-//   const { userId } = req.payload;
-
-//   /**Get all chats where the user is a participant sorted by date*/
-//   const allChats = await Chat.find({
-//     $or: [{ sender: userId }, { receiver: userId }],
-//   }).sort({ createdAt: -1 });
-//   const sortedChats = []; //the finally sorted chats array will be returned to the caller
-//   /**loop through the chats and separate chat he has with different users */
-  
-//   for (let i = 0; i < allChats.length; i++) {
-//     let chat = allChats[i]; //a particular chat object from allChats array(array of chat objects)
-//     let { receiver, sender } = chat;
-//     const currentUserId = new mongoose.Types.ObjectId(userId);
-//     const partnerId = (sender === currentUserId) ? receiver : sender;
-//     /**check if the partner and the user chats have been added to the sortedChats already */
-//     if (
-//       sortedChats.includes(
-//         (chat) => chat.receiver === partnerId || chat.sender === partnerId
-//       )
-//     ) 
-//       continue; //skip the loop if the chat with the partner is already in the sortedChats
-
-//     //the chat with the partner here will be added to the chat will the partner
-//     // let chatWithPartner = allChats.filter(
-//     //   (chat) => {(chat.sender === currentUserId && chat.receiver === partnerId) || (chat.sender === partnerId && chat.sender === currentUserId)
-//     //   });
-
-//     // console.log({chatWithPartner})
-//     sortedChats.push(chatWithPartner);
-//   }
-//   res.status(StatusCodes.OK).json({ data: sortedChats });
-// };
-
 const getAllChatsOfAUser = async (req, res, next) => {
-    const { userId } = req.payload;
-  
-    /**Get all chats where the user is a participant sorted by date*/
-    const allChats = await Chat.find({
-      $or: [{ sender: userId }, { receiver: userId }],
-    }).sort({ createdAt: -1 });
-    const sortedChats = []; //the finally sorted chats array will be returned to the caller
-    /**loop through the chats and separate chat he has with different users */
-    
-    for (let i = 0; i < allChats.length; i++) {
-      let chat = allChats[i]; //a particular chat object from allChats array(array of chat objects)
-      let { receiver, sender } = chat;
-      const currentUserId = new mongoose.Types.ObjectId(userId);
-      const partnerId = (sender === currentUserId) ? receiver : sender;
-      /**check if the partner and the user chats have been added to the sortedChats already */
-      if (
-        sortedChats.some(
-          (chat) => chat.receiver === partnerId || chat.sender === partnerId
+  const { userId } = req.payload;
+
+  /**Get all chats where the user is a participant sorted by date*/
+  const allChats = await Chat.find({
+    $or: [{ sender: userId }, { receiver: userId }],
+  }).sort({ createdAt: -1 });
+  const sortedChats = [ ]; //the finally sorted chats array will be returned to the caller
+  /**loop through the chats and separate chat he has with different users */
+  for (chat of allChats) {
+    let { receiver, sender } = chat;
+    const currentUserId = userId
+    const partnerId = (sender.toString() === currentUserId) ? receiver.toString() : sender.toString();
+    /**check if the partner and the user chats have been added to the sortedChats already */
+    if (
+      sortedChats.includes(
+        chat.receiver.toString() === partnerId ||
+          chat.sender.toString() === partnerId
+      )
+    ) continue;
+     
+      function callbackFn(chat) {
+        if (
+          (chat.sender.toString() === currentUserId &&
+            chat.receiver.toString() === partnerId) ||
+          (chat.sender.toString() === partnerId &&
+            chat.receiver.toString() === currentUserId)
         )
-      ) 
-        continue; //skip the loop if the chat with the partner is already in the sortedChats
+          return true;
+      } 
+    //the chat with the partner here will be added to the chat will the partner
+    
+    // let chatWithPartner = allChats.filter(callbackFn);
+    let chatWithPartner = allChats.filter(
+      (chat) =>
+        chat.receiver.toString() === partnerId ||
+        chat.sender.toString() === partnerId
+    );
+
+    sortedChats.push(chatWithPartner);
+
+  }
+  res.status(StatusCodes.OK).json({ data: sortedChats });
+};
+
+// const getAllChatsOfAUser = async (req, res, next) => {
+//     const { userId } = req.payload;
+    
+//     /**Get all chats where the user is a participant sorted by date*/
+//     const allChats = await Chat.find({
+//       $or: [{ sender: userId }, { receiver: userId }],
+//     }).sort({ createdAt: -1 });
+//     const sortedChats = []; //the finally sorted chats array will be returned to the caller
+//     /**loop through the chats and separate chat he has with different users */
+    
+//     for (let i = 0; i < allChats.length; i++) {
+//       let chat = allChats[i]; //a particular chat object from allChats array(array of chat objects)
+//       let { receiver, sender } = chat;
+//       const currentUserId = new mongoose.Types.ObjectId(userId);
+//       const partnerId = (sender === currentUserId) ? receiver : sender;
+//       /**check if the partner and the user chats have been added to the sortedChats already */
+//       if (
+//         sortedChats.some(
+//           (chat) => chat.receiver === partnerId || chat.sender === partnerId
+//         )
+//       ) 
+//         continue; //skip the loop if the chat with the partner is already in the sortedChats
   
-      //the chat with the partner here will be added to the chat with the partner
-      let chatWithPartner = allChats.find(
-        (chat) => (chat.sender.equals(currentUserId) && chat.receiver.equals(partnerId)) || (chat.sender.equals(partnerId) && chat.receiver.equals(currentUserId))
-      );
+//       //the chat with the partner here will be added to the chat with the partner
+//       let chatWithPartner = allChats.find(
+//         (chat) => (chat.sender.equals(currentUserId) && chat.receiver.equals(partnerId)) || (chat.sender.equals(partnerId) && chat.receiver.equals(currentUserId))
+//       );
   
-      if (chatWithPartner !== null) {
-        sortedChats.push(chatWithPartner);
-      }
-    }
-    res.status(StatusCodes.OK).json({ data: sortedChats });
-  };
+//       if (chatWithPartner !== null) {
+//         sortedChats.push(chatWithPartner);
+//       }
+//     }
+//     res.status(StatusCodes.OK).json({ data: sortedChats });
+//   };
   
 const getAllChatsWithOtherUsers = async (req, res, next) => {
     const { userId } = req.payload;

@@ -7,3 +7,4 @@ module.exports = {
   Chat: require("./chat"),
   Assignment: require("./course/assignment"),
 };
+ 
