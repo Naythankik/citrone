@@ -274,7 +274,7 @@ const gradeAUserSubmission = async (req, res) => {
       res.status(400).send({ succes: false, error: error.details[0].message });
     }
 
-    // assigng the submissions field to a constant
+    // assing the submissions field to a constant
     const submission = assignment.submissions;
 
     try {
@@ -282,7 +282,16 @@ const gradeAUserSubmission = async (req, res) => {
       // the return the object of the submission
       submission.filter(async (user) => {
         if (user.user == userId) {
-          //update the learner grade
+          // check if the user has been graded,
+          if (user.grade) {
+            res.status(400).send({
+              success: true,
+              message: "grade exist for the user already",
+            });
+            return;
+          }
+
+          // else update the learner grade
           const { modifiedCount } = await Assignment.updateOne(
             { id: id, "submissions.user": userId },
             {
@@ -291,7 +300,7 @@ const gradeAUserSubmission = async (req, res) => {
           );
 
           if (modifiedCount) {
-            // check if the user subscribes to mail when graded
+            // check if the user subscribes to receive mail when graded
             if (user.mail) {
               // send mail to the user else do nothing
 
