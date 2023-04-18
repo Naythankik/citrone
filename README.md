@@ -5,11 +5,14 @@
   
 ## CITRONE DOCUMENTATION 
   [https://www.postman.com/naythankik/workspace/citrone](https://www.postman.com/naythankik/workspace/citrone)
+  
+## HOSTING URL
+  [https://citrone-crater-prod.up.railway.app/](https://citrone-crater-prod.up.railway.app/)
+
 
 ## Routings
 - Default routes : GET [/](/),[/api/citrone/](/api/citrone/),[/*](/*)
 
-## HOSTING URL: [https://citrone-crater-prod.up.railway.app/](https://citrone-crater-prod.up.railway.app/)
 #### User Routes
 
 - Default user route / Get a user profile : GET : [/api/citrone/user](/api/citrone/user)
