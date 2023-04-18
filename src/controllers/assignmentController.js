@@ -168,9 +168,19 @@ const updateAssignment = async (req, res) => {
   // destructure the parameters from the request and fetch the id
   const { id } = req.params;
 
+  const value = req.body;
+
+  // check if the value is an empty object,
+  // if true, return an error to the user
+  if (Object.keys(value)) {
+    res.status(400).send({ success: false, error: "input can not be empty" });
+    return;
+  }
+
+  //else
   try {
     //find the document using the id and update
-    const assignment = await Assignment.findByIdAndUpdate(id, req.body);
+    const assignment = await Assignment.findByIdAndUpdate(id, value);
 
     // if it returns null, send a failed response to the user
     if (!assignment) {
@@ -193,14 +203,28 @@ const deleteAssignment = async (req, res) => {
   const { id } = req.params;
 
   try {
-    //find the document using the id and delete
-    const assignment = await Assignment.findByIdAndDelete(id);
+    //find the document using the id
+    const assignment = await Assignment.findById(id);
 
     // if it returns null, send a failed response to the user
     if (!assignment) {
       res.status(400).send({ error: "assigment not found" });
       return;
     }
+
+    // check if the assignment submission field is not empty
+    if (assignment.submissions.length > 0) {
+      //loop through the submissions if there it is more than zero
+      //use the user field to find the user from the user model and update the assignment field on the user document
+      for (let user of assignment.submissions) {
+        await User.findByIdAndUpdate(user.user, {
+          $pull: { assignment: assignment.id },
+        });
+      }
+    }
+
+    //delete the assignment documents
+    await assignment.deleteOne();
 
     //return a success response to the user
     res.status(200).send({ message: "assignment has been deleted" });
@@ -274,7 +298,7 @@ const gradeAUserSubmission = async (req, res) => {
       res.status(400).send({ succes: false, error: error.details[0].message });
     }
 
-    // assigng the submissions field to a constant
+    // assing the submissions field to a constant
     const submission = assignment.submissions;
 
     try {
@@ -282,7 +306,16 @@ const gradeAUserSubmission = async (req, res) => {
       // the return the object of the submission
       submission.filter(async (user) => {
         if (user.user == userId) {
-          //update the learner grade
+          // check if the user has been graded,
+          if (user.grade) {
+            res.status(400).send({
+              success: true,
+              message: "grade exist for the user already",
+            });
+            return;
+          }
+
+          // else update the learner grade
           const { modifiedCount } = await Assignment.updateOne(
             { id: id, "submissions.user": userId },
             {
@@ -291,7 +324,7 @@ const gradeAUserSubmission = async (req, res) => {
           );
 
           if (modifiedCount) {
-            // check if the user subscribes to mail when graded
+            // check if the user subscribes to receive mail when graded
             if (user.mail) {
               // send mail to the user else do nothing
 
