@@ -31,6 +31,10 @@ const Module = new mongoose.Schema(
         required: true,
       },
     ],
+    quiz: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "quiz",
+    },
   },
   { timestamps: true }
 );
