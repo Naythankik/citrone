@@ -106,16 +106,17 @@ const userLogout = async (req, res) => {
 const createAccount = async (req, res, next) => {
   try {
     //validating the user's inputed data with joi schema
-    const validation = signUpSchema(req.body);
-    if (validation.error) {
-      res
-        .status(StatusCodes.UNPROCESSABLE_ENTITY)
-        .send(validation.error.details[0].message);
+    const { error, value } = signUpSchema(req.body);
+    if (error) {
+      res.status(StatusCodes.UNPROCESSABLE_ENTITY).send({
+        success: false,
+        error: error.details[0].message,
+      });
       return;
     }
     const userAlreadyExist = await doesUserExist(
       User,
-      validation.value,
+      value,
       "email",
       "phoneNumber"
     );
@@ -126,7 +127,7 @@ const createAccount = async (req, res, next) => {
     }
 
     //if the validation and checking passed we create the new  user
-    const newUser = new User(validation.value);
+    const newUser = new User(value);
     newUser.username = await generateUsername(User, newUser.firstName); //generating a username for the new user
     await newUser.save();
     const payload = generatePayload(newUser);
