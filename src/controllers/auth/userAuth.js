@@ -104,8 +104,6 @@ const userLogout = async (req, res) => {
 };
 
 const createAccount = async (req, res, next) => {
-  res.status(200).send("succeess");
-  return;
   try {
     //validating the user's inputed data with joi schema
     const validation = signUpSchema(req.body);
@@ -136,7 +134,11 @@ const createAccount = async (req, res, next) => {
     req.body.payload = payload;
     next();
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err.message);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      success: false,
+      message: err.message,
+    });
+    return;
   }
 };
 
