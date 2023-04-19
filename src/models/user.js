@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "email is required"],
       unique: true, // `email` must be unique
-      match: /.+\@.+\..+/,
+      // match: /.+\@.+\..+/,
       unique: true,
     },
     phoneNumber: {
