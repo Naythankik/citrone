@@ -7,6 +7,8 @@ const userRouter = require("./routes/userRouter");
 const { authRouter } = require("./routes/index");
 const chatRouter = require("./routes/chatRouters");
 
+const cors = require("cors");
+
 const { resetPassword } = require("./src/controllers/userControllers");
 const { verifySignUpMail } = require("./src/middlewares/createAccount");
 const { authentication } = require("./src/middlewares/authentication");
@@ -17,6 +19,9 @@ const PORT = process.env.PORT;
 connection(); //server connection function
 
 //Middlewares
+
+app.use(cors());
+
 app.use(express.json());
 app.use(logger("dev")); //logger to log every request and response summary
 
