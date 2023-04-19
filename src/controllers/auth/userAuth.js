@@ -120,6 +120,7 @@ const createAccount = async (req, res, next) => {
       "email",
       "phoneNumber"
     );
+
     if (userAlreadyExist) {
       return res
         .status(userAlreadyExist.status)
