@@ -62,7 +62,7 @@ const generateSignUpMail = async (req, res, next) => {
     let mail = MailGenerator.generate(response);
 
     const message = {
-      from: process.env.SENDER_EMAIL, //save a sender on the .env and fetch
+      // from: process.env.SENDER_EMAIL, //save a sender on the .env and fetch
       from: "kingflourish1@gmail.com", //save a sender on the .env and fetch
 
       to: user.email,
