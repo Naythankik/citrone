@@ -27,7 +27,7 @@ const generateSignUpMail = async (req, res, next) => {
     const token = jwt.sign(payload, JWT_SECRET, {
       expiresIn: maxAge, // 10mins
     });
-
+    
     // send the token to the database and the email address of the user
     const user = await User.findByIdAndUpdate(payload.userId, {
       $set: { registrationToken: token },
@@ -52,7 +52,7 @@ const generateSignUpMail = async (req, res, next) => {
           button: {
             color: "green",
             text: "Verify email address",
-            link: `http://localhost:8070/api/citrone/email/verify/${token}`,
+            link: `https://citrone-crater-prod.up.railway.app/api/citrone/email/verify/${token}`,
           },
         },
         outro: "happy learning. we wish you the very best",
