@@ -106,6 +106,18 @@ const createAccount = async (req, res, next) => {
         .send(validation.error.details[0].message);
       return;
     }
+
+    //my own short codes to test it from frontend
+
+    const user = new User(validation.value);
+    newUser.username = await generateUsername(User, user.firstName); //generating a username for the new user
+    await newUser.save();
+
+    res.status(200).send({ succes: true, message: "user created succesfully" });
+    return;
+
+    //the end
+
     const userAlreadyExist = await doesUserExist(
       User,
       validation.value,
