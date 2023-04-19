@@ -4,7 +4,7 @@ function signUpSchema(data) {
   const schema = Joi.object({
     firstName: Joi.string().min(2).max(16).valid().required(),
     lastName: Joi.string().min(2).max(16).valid().required(),
-    phoneNumber: Joi.number().integer().required(),
+    phoneNumber: Joi.string().required(),
     email: Joi.string().email().required().lowercase(),
     password: Joi.string().alphanum().min(6).max(16).required(),
   });
