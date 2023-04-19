@@ -104,6 +104,7 @@ const userLogout = async (req, res) => {
 };
 
 const createAccount = async (req, res, next) => {
+  console.log('req.body :', req.body);
   try {
     //validating the user's inputed data with joi schema
     const { error, value } = signUpSchema(req.body);
