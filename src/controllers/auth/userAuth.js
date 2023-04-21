@@ -18,7 +18,6 @@ const userLogin = async (req, res) => {
   const validation = loginSchema(req.body);
 
   const { error, value } = validation;
-  console.log(error, value);
   if (error) {
     return res
       .status(StatusCodes.UNPROCESSABLE_ENTITY)
