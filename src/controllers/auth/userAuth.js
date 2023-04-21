@@ -71,6 +71,8 @@ const userLogin = async (req, res) => {
       expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now,
     });
 
+    user.token = token;
+
     user.isActive = true; //the user is active (i.e online until he logout)
 
     await user.save();
