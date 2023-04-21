@@ -18,6 +18,7 @@ const userLogin = async (req, res) => {
   const validation = loginSchema(req.body);
 
   const { error, value } = validation;
+  console.log(error, value);
   if (error) {
     return res
       .status(StatusCodes.UNPROCESSABLE_ENTITY)
@@ -104,7 +105,7 @@ const userLogout = async (req, res) => {
 };
 
 const createAccount = async (req, res, next) => {
-  console.log('req.body :', req.body);
+  console.log("req.body :", req.body);
   try {
     //validating the user's inputed data with joi schema
     const { error, value } = signUpSchema(req.body);
