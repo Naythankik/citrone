@@ -27,7 +27,7 @@ const generateSignUpMail = async (req, res, next) => {
     const token = jwt.sign(payload, JWT_SECRET, {
       expiresIn: maxAge, // 10mins
     });
-    
+
     // send the token to the database and the email address of the user
     const user = await User.findByIdAndUpdate(payload.userId, {
       $set: { registrationToken: token },
@@ -55,7 +55,7 @@ const generateSignUpMail = async (req, res, next) => {
             link: `https://citrone-crater-prod.up.railway.app/api/citrone/email/verify/${token}`,
           },
         },
-        outro: "happy learning. we wish you the very best",
+        outro: "Happy learning. we wish you the very best",
       },
     };
 
@@ -63,7 +63,7 @@ const generateSignUpMail = async (req, res, next) => {
 
     const message = {
       // from: process.env.SENDER_EMAIL, //save a sender on the .env and fetch
-      from: "kingflourish1@gmail.com", //save a sender on the .env and fetch
+      from: "Citrone citrone@co.ng", //save a sender on the .env and fetch
 
       to: user.email,
       subject: "citrone email verification one",
