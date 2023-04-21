@@ -18,7 +18,6 @@ const userLogin = async (req, res) => {
   const validation = loginSchema(req.body);
 
   const { error, value } = validation;
-  console.log(error, value);
   if (error) {
     return res
       .status(StatusCodes.UNPROCESSABLE_ENTITY)
@@ -71,6 +70,8 @@ const userLogin = async (req, res) => {
       httpOnly: true,
       expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now,
     });
+
+    user.token = token;
 
     user.isActive = true; //the user is active (i.e online until he logout)
 
