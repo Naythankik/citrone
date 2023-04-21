@@ -63,10 +63,9 @@ const generateSignUpMail = async (req, res, next) => {
 
     const message = {
       // from: process.env.SENDER_EMAIL, //save a sender on the .env and fetch
-      from: "Citrone citrone@co.ng", //save a sender on the .env and fetch
-
+      from: "Citrone dolapokiki3ird@gmail.com", //save a sender on the .env and fetch
       to: user.email,
-      subject: "citrone email verification one",
+      subject: "CITRONE EMAIL VERIFICATION",
       html: mail,
     };
 
