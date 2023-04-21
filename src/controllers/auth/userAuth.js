@@ -67,6 +67,7 @@ const userLogin = async (req, res) => {
     const payload = generatePayload(user);
     const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
     res.cookie("token", token, {
+      domain: "https://citrone-redesign-crater.vercel.app/",
       httpOnly: true,
       expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now,
     });
