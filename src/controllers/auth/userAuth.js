@@ -124,7 +124,6 @@ const userLogout = async (req, res) => {
 };
 
 const createAccount = async (req, res, next) => {
-  console.log("req.body :", req.body);
   try {
     //validating the user's inputed data with joi schema
     const { error, value } = signUpSchema(req.body);
@@ -173,7 +172,7 @@ const forgetPassword = async (req, res) => {
     const user = await User.findOne({ email });
 
     //   //if user is not found , return a response of 404
-    if (!user) res.send({ error: "Email is not found" });
+    if (!user) res.status(404).send({ error: "Email is not found" });
 
     // if found, create a token
     const token = crypto.randomBytes(32).toString("hex");
@@ -236,13 +235,17 @@ const resetPassword = async (req, res) => {
 
     // check if password is undefined
     if (!password) {
-      res.status(400).send("Password must be provided");
+      res
+        .status(400)
+        .send({ success: false, error: "Password must be provided" });
       return;
     }
 
     //check if the password matches with confirm password
     if (password !== confirmPassword) {
-      res.status(403).send("Password does not match");
+      res
+        .status(403)
+        .send({ success: false, error: "Password does not match" });
       return;
     }
 
