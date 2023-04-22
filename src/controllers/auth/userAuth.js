@@ -28,6 +28,7 @@ const userLogin = async (req, res) => {
     /**find a user with the provided email and check if the email and password matched */
     const { email, password } = value;
     const user = await User.findOne({ email });
+
     if (!user) {
       return res
         .status(StatusCodes.NOT_FOUND)
@@ -50,12 +51,14 @@ const userLogin = async (req, res) => {
     const existingToken = req.cookies.token;
     if (existingToken) {
       const decodedToken = jwt.verify(existingToken, jwtSecret);
+
       /**if the new user is different from the currently login user */
       if (decodedToken.userId !== user._id)
         res.clearCookie("token", {
           httpOnly: true,
           secure: true,
         });
+
       // update the current login user isActive status to false
       await User.findByIdAndUpdate(decodedToken.userId, {
         $set: {
@@ -66,8 +69,8 @@ const userLogin = async (req, res) => {
     /**Attaching payload to cookie * and allow it to clear automatically after expiration*/
     const payload = generatePayload(user);
     const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
+
     res.cookie("token", token, {
-      domain: "https://citrone-redesign-crater.vercel.app/",
       httpOnly: true,
       expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now,
     });
@@ -75,7 +78,19 @@ const userLogin = async (req, res) => {
     user.isActive = true; //the user is active (i.e online until he logout)
 
     await user.save();
-    res.status(StatusCodes.OK).json({ data: user, token: token });
+
+    // restrict the fields sent to the user
+    const data = await User.findById(user.id).select([
+      "-password",
+      "-status",
+      "-__v",
+      "-createdAt",
+      "-updatedAt",
+      "-registrationToken",
+      "-assignment",
+    ]);
+
+    res.status(StatusCodes.OK).json({ data });
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err.message);
   }
@@ -85,23 +100,27 @@ const userLogin = async (req, res) => {
 const userLogout = async (req, res) => {
   const { token } = req.cookies;
 
-  // fetch the user id from the token
-  const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+  try {
+    // fetch the user id from the token
+    const { userId } = jwt.verify(token, process.env.JWT_SECRET);
 
-  // update the user isActive status to false
-  await User.findByIdAndUpdate(userId, {
-    $set: {
-      isActive: false,
-    },
-  });
+    // update the user isActive status to false
+    await User.findByIdAndUpdate(userId, {
+      $set: {
+        isActive: false,
+      },
+    });
 
-  //clear the authenticated user token after updating the user
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: true,
-  });
+    //clear the authenticated user token after updating the user
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+    });
 
-  res.status(StatusCodes.OK).json({ message: "user logged out" });
+    res.status(StatusCodes.OK).json({ message: "user logged out" });
+  } catch (error) {
+    res.send({ success: false, error: error.message });
+  }
 };
 
 const createAccount = async (req, res, next) => {
@@ -154,7 +173,7 @@ const forgetPassword = async (req, res) => {
     const user = await User.findOne({ email });
 
     //   //if user is not found , return a response of 404
-    if (!user) throw new Error("Email is not found");
+    if (!user) res.send({ error: "Email is not found" });
 
     // if found, create a token
     const token = crypto.randomBytes(32).toString("hex");
@@ -193,8 +212,9 @@ const forgetPassword = async (req, res) => {
       .send({ message: "Mail has been sent to the email address provided" });
     return;
   } catch (error) {
-    throw new Error(error);
+    res.send({ error: error.message });
   }
+  return;
 };
 
 const resetPassword = async (req, res) => {
