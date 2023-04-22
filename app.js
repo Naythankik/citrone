@@ -30,7 +30,13 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/api/citrone/getUsers", async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select([
+      "firstName",
+      "lastName",
+      "email",
+      "username",
+      "phoneNumber",
+    ]);
     res.status(200).send({ message: users });
   } catch (error) {
     res.status(400).send({ success: false, error: error.message });
