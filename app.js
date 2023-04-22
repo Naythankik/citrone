@@ -29,8 +29,8 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/api/citrone/getUsers", async (req, res) => {
-  const users = await User.find();
-  res.status(200).send({ message: users });
+  // const users = await User.find();
+  res.status(200).send({ message: "welcome to citrone" });
   return;
 });
 
