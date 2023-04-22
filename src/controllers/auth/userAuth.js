@@ -37,12 +37,10 @@ const userLogin = async (req, res) => {
 
     const doesPasswordMatch = await user.comparePassword(password);
     if (!doesPasswordMatch) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .send({
-          succes: false,
-          error: "wrong password provided try again with another password",
-        });
+      return res.status(StatusCodes.UNAUTHORIZED).send({
+        succes: false,
+        error: "wrong password provided try again with another password",
+      });
     }
 
     //check if the user status is pending
@@ -76,6 +74,8 @@ const userLogin = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now,
+      sameSite: "none",
+      secure: true,
     });
 
     user.isActive = true; //the user is active (i.e online until he logout)
