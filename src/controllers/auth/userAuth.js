@@ -39,7 +39,10 @@ const userLogin = async (req, res) => {
     if (!doesPasswordMatch) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
-        .send("wrong password provided try again with another password");
+        .send({
+          succes: false,
+          error: "wrong password provided try again with another password",
+        });
     }
 
     //check if the user status is pending
