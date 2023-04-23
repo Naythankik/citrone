@@ -7,7 +7,7 @@
   [https://www.postman.com/naythankik/workspace/citrone](https://www.postman.com/naythankik/workspace/citrone)
   
 ## HOSTING URL
-  [https://citrone-crater-prod.up.railway.app/](https://citrone-crater-prod.up.railway.app/)
+  [https://citrone.vercel.app/](https://citrone.vercel.app/)
 
 
 ## Routings
