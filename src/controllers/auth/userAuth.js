@@ -74,8 +74,7 @@ const userLogin = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now,
-      sameSite: "none",
-      // secure: true,
+      secure: true,
     });
 
     user.isActive = true; //the user is active (i.e online until he logout)
