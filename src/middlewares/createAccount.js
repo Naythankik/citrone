@@ -46,13 +46,13 @@ const generateSignUpMail = async (req, res, next) => {
     let response = {
       body: {
         name: payload.username,
-        intro: "Welcome Stutern Citrone Platform",
+        intro: "Welcome to Stutern Citrone Platform",
         action: {
           instructions: "Please click the button below to verify your account",
           button: {
             color: "green",
             text: "Verify email address",
-            link: `https://citrone-crater-prod.up.railway.app/api/citrone/email/verify/${token}`,
+            link: `${process.env.APP_URL}/api/citrone/email/verify/${token}`,
           },
         },
         outro: "Happy learning. we wish you the very best",
@@ -63,7 +63,7 @@ const generateSignUpMail = async (req, res, next) => {
 
     const message = {
       // from: process.env.SENDER_EMAIL, //save a sender on the .env and fetch
-      from: "Citrone citrone@co.ng", //save a sender on the .env and fetch
+      from: "Citrone citrone@gmail.com.co.ng", //save a sender on the .env and fetch
       to: user.email,
       subject: "CITRONE EMAIL VERIFICATION",
       html: mail,
@@ -102,7 +102,7 @@ const verifySignUpMail = async (req, res) => {
     );
     //update the registrationToken field to undefined
 
-    res.redirect(process.env.APP_URL);
+    res.redirect(process.env.HOSTED_URL);
     return;
   } catch (err) {
     res
