@@ -12,9 +12,6 @@ const generateSignUpMail = async (req, res, next) => {
 
     /** my gmail information */
 
-    //The config object is missing a secure and port field,
-    //There by stopping the email from sending
-
     const config = {
       service: "gmail",
       auth: {
@@ -22,6 +19,9 @@ const generateSignUpMail = async (req, res, next) => {
         pass: process.env.EMAIL_PASS,
       },
     };
+
+    //The config object is missing a secure and port field,
+    //There by stopping the email from sending
 
     const maxAge = "10m";
     const token = jwt.sign(payload, JWT_SECRET, {
@@ -39,7 +39,7 @@ const generateSignUpMail = async (req, res, next) => {
       theme: "default",
       product: {
         name: "Stutern",
-        link: `http://www.stutern.com`,
+        link: `${process.env.HOSTED_URL}`,
       },
     });
 
