@@ -12,16 +12,16 @@ const generateSignUpMail = async (req, res, next) => {
 
     /** my gmail information */
 
+    // const config = {
+    //   service: "gmail",
+    //   auth: {
+    //     user: process.env.EMAIL,
+    //     pass: process.env.EMAIL_PASS,
+    //   },
+    // };
+
     //The config object is missing a secure and port field,
     //There by stopping the email from sending
-
-    const config = {
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASS,
-      },
-    };
 
     const maxAge = "10m";
     const token = jwt.sign(payload, JWT_SECRET, {
@@ -33,13 +33,21 @@ const generateSignUpMail = async (req, res, next) => {
       $set: { registrationToken: token },
     });
 
-    let transporter = nodemailer.createTransport(config);
+    let transporter = nodemailer.createTransport({
+      host: process.env.MAIL_HOST,
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: process.env.MAIL_USERNAME, // generated ethereal user
+        pass: process.env.MAIL_PASSWORD, // generated ethereal password
+      },
+    });
 
     let MailGenerator = new Mailgen({
       theme: "default",
       product: {
         name: "Stutern",
-        link: `http://www.stutern.com`,
+        link: `${process.env.HOSTED_URL}`,
       },
     });
 
