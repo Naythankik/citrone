@@ -12,8 +12,6 @@ const { doesUserExist, generateUsername } = require("../../utils");
 
 /**user login controller */
 const userLogin = async (req, res) => {
-  // Check if a user is active at the moment on the device
-
   /**Validate the data in the req.body */
   const validation = loginSchema(req.body);
 
@@ -76,10 +74,10 @@ const userLogin = async (req, res) => {
     const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
 
     res.cookie("token", token, {
-      httpOnly: false,
+      // httpOnly: true,
       maxAge: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now,
       domain: process.env.APP_URL,
-      secure: true,
+      // secure: true,
     });
 
     user.isActive = true; //the user is active (i.e online until he logout)
