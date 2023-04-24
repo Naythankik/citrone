@@ -71,12 +71,6 @@ const userLogin = async (req, res) => {
     const payload = generatePayload(user);
     const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: Date.now() + 30 * 60 * 1000, // 30 minutes from now,
-      secure: true,
-    });
-
     user.isActive = true; //the user is active (i.e online until he logout)
 
     await user.save();
@@ -92,9 +86,7 @@ const userLogin = async (req, res) => {
       "-assignment",
     ]);
 
-    console.log(res.cookies);
-
-    res.status(StatusCodes.OK).json({ data });
+    res.status(StatusCodes.OK).send({ data });
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err.message);
   }
