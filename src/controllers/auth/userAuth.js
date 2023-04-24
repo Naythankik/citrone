@@ -74,6 +74,7 @@ const userLogin = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: Date.now() + 30 * 60 * 1000, // 30 minutes from now,
+      domain: process.env.APP_URL,
       secure: true,
     });
 
