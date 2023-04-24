@@ -76,7 +76,7 @@ const userLogin = async (req, res) => {
     const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
 
     res.cookie("token", token, {
-      httpOnly: true,
+      httpOnly: false,
       maxAge: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now,
       domain: process.env.APP_URL,
       secure: true,
