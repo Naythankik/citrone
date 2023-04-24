@@ -74,10 +74,10 @@ const userLogin = async (req, res) => {
     const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
 
     res.cookie("token", token, {
-      // httpOnly: true,
+      httpOnly: true,
       maxAge: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now,
       domain: process.env.APP_URL,
-      // secure: true,
+      secure: true,
     });
 
     user.isActive = true; //the user is active (i.e online until he logout)
