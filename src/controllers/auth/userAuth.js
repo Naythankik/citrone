@@ -92,10 +92,13 @@ const userLogin = async (req, res) => {
       "-assignment",
     ]);
 
+    console.log(res.cookies);
+
     res.status(StatusCodes.OK).json({ data });
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err.message);
   }
+  return;
 };
 
 /**user logout controller */
