@@ -30,6 +30,7 @@
     "mailgen": "^2.0.27",
     "mongoose": "^7.0.3",
     "nodemailer": "^6.9.1",
+    "passport-google-oauth20": "^2.0.0",
     "slugify": "^1.6.6"
   },
   "devDependencies": {
