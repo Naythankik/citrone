@@ -27,7 +27,11 @@ const userLogin = async (req, res) => {
   try {
     /**find a user with the provided email and check if the email and password matched */
     const { email, password } = value;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select([
+      "-__v",
+      "-createdAt",
+      "-updatedAt",
+    ]);
 
     if (!user) {
       return res
@@ -78,25 +82,14 @@ const userLogin = async (req, res) => {
       secure: true,
     });
 
-    //set header
-    res.setHeader("Set-cookie", token);
-
     user.isActive = true; //the user is active (i.e online until he logout)
 
     await user.save();
 
     // restrict the fields sent to the user
-    const data = await User.findById(user.id).select([
-      "-password",
-      "-status",
-      "-__v",
-      "-createdAt",
-      "-updatedAt",
-      "-registrationToken",
-      "-assignment",
-    ]);
+    user.password = user.status = user.registrationToken = undefined;
 
-    res.status(StatusCodes.OK).send({ data });
+    res.status(StatusCodes.OK).send({ user });
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err.message);
   }
