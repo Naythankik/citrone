@@ -20,7 +20,7 @@ connection(); //server connection function
 
 //Middlewares
 
-app.use(cors({ origin: process.env.APP_URL, credentials: true }));
+app.use(cors({ origin: process.env.APP_URL }));
 
 app.use(express.json());
 app.use(logger("dev")); //logger to log every request and response summary
