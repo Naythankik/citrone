@@ -10,6 +10,9 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES;
 const { signUpSchema, loginSchema } = require("../../utils/joiSchema");
 const { doesUserExist, generateUsername } = require("../../utils");
 
+//the environment
+const environment = process.env.NODE_ENV;
+
 /**user login controller */
 const userLogin = async (req, res) => {
   /**Validate the data in the req.body */
@@ -76,8 +79,7 @@ const userLogin = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now,
-      domain: process.env.APP_URL,
-      secure: true,
+      secure: environment == "dev" ? false : true,
     });
 
     user.isActive = true; //the user is active (i.e online until he logout)
