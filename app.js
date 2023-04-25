@@ -20,7 +20,19 @@ connection(); //server connection function
 
 //Middlewares
 
-app.use(cors({ origin: process.env.APP_URL }));
+app.use(cors({ origin: process.env.APP_URL, credentials: true }));
+
+//Frontend axios call
+//the object should be pass as third argument
+
+//  {
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+//   withCredentials: true,
+// }
+
+// The End
 
 app.use(express.json());
 app.use(logger("dev")); //logger to log every request and response summary
