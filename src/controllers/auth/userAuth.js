@@ -80,6 +80,7 @@ const userLogin = async (req, res) => {
       httpOnly: true,
       maxAge: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now,
       secure: environment == "dev" ? false : true,
+      domain: process.env.HOSTED_URL,
     });
 
     user.isActive = true; //the user is active (i.e online until he logout)
