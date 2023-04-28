@@ -25,7 +25,6 @@ connection(); //server connection function
 /**allow cross-origin-request-sharing(CORS)*/
 app.use(
   cors({
-    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
     origin: "https://citrone-redesign-crater.vercel.app/"
   })
 );
