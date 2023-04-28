@@ -19,8 +19,8 @@ const PORT = process.env.PORT;
 connection(); //server connection function
 
 //Middlewares
-
-app.use(cors({ origin: "*", credentials: true, allowedHeaders: true }));
+/**You cannot specify the credentials 'true' and origin to be from anywhere (i.e '*')*/
+// app.use(cors({ origin: "*", credentials: true, allowedHeaders: true }));
 
 app.use(express.json());
 app.use(logger("dev")); //logger to log every request and response summary
