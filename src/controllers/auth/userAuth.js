@@ -13,7 +13,6 @@ const { doesUserExist, generateUsername } = require("../../utils");
 /**user login controller */
 const userLogin = async (req, res) => {
   // Check if a user is active at the moment on the device
-
   /**Validate the data in the req.body */
   const validation = loginSchema(req.body);
 
