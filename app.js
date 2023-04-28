@@ -22,13 +22,15 @@ connection(); //server connection function
 /**You cannot specify the credentials 'true' and origin to be from anywhere (i.e '*')*/
 // app.use(cors({ origin: "*", credentials: true, allowedHeaders: true }));
 
-/**allow cross-origin-request-sharing(CORS)*/
-app.use(
-  cors({
-    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
-    origin: "https://citrone-redesign-crater.vercel.app/"
-  })
-);
+app.use(cors({ origin: "*" }));
+
+// /**allow cross-origin-request-sharing(CORS)*/
+// app.use(
+//   cors({
+//     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+//     origin: "https://citrone-redesign-crater.vercel.app/"
+//   })
+// );
 app.use(express.json());
 app.use(logger("dev")); //logger to log every request and response summary
 
