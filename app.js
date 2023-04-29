@@ -28,7 +28,8 @@ connection(); //server connection function
 app.use(
   cors({
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
-    origin: "https://citrone-redesign-crater.vercel.app"
+    origin: "https://citrone-redesign-crater.vercel.app",
+    credentials: true
   })
 );
 app.use(express.json());
