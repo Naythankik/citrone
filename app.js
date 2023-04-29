@@ -22,8 +22,6 @@ connection(); //server connection function
 /**You cannot specify the credentials 'true' and origin to be from anywhere (i.e '*')*/
 // app.use(cors({ origin: "*", credentials: true, allowedHeaders: true }));
 
-// app.use(cors({ origin: "*" }));
-
 /**allow cross-origin-request-sharing(CORS)*/
 app.use(
   cors({
