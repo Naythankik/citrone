@@ -1,19 +1,21 @@
-
+const generateUsername = require("./generateUsername")
 const addGoogleUser = async (User,{
   id,
   email,
   firstName,
   lastName,
-  profilePhoto,
+//   profilePhoto,
 }) => {
-  const user = new User(User,{
+  const user = await new User({
     id,
     email,
     firstName,
     lastName,
-    profilePhoto,
+    // profilePhoto,
     source: "google", 
   });
+user.username = await generateUsername(User,user.firstName) //generate username for user signing up with google auth
+
   return user.save();
 };
 
