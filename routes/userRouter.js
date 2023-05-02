@@ -2,6 +2,13 @@ const express = require("express");
 const {
   getAllAssignments,
   createAssignment,
+  updateAssignment,
+  deleteAssignment,
+  getAnAssignment,
+  submitAssignment,
+  getSubmission,
+  getAUserSubmission,
+  gradeAUserSubmission,
 } = require("../src/controllers/assignmentController");
 const {
   getCoursesLevel,
@@ -24,6 +31,7 @@ const {
 } = require("../src/controllers/userControllers");
 
 const authorization = require("../src/middlewares/authorization");
+const assignment = require("../src/models/course/assignment");
 
 const router = express.Router();
 
@@ -31,6 +39,22 @@ router.route("/").get(getUserAccount).put(updateUserProfile);
 
 // routes for assigment
 router.route("/assignment").get(getAllAssignments);
+
+//update the asssignment by the id
+router
+  .route("/assignment/:id")
+  .get(getAnAssignment)
+  .post(submitAssignment)
+  .put(authorization, updateAssignment)
+  .delete(authorization, deleteAssignment);
+
+// get all submission for an assignment
+router
+  .get("/assignment/:id/submissions", authorization, getSubmission)
+  .get("/assignment/:id/submission/:userId", getAUserSubmission)
+  .post("/assignment/:id/submission/:userId", gradeAUserSubmission);
+
+//create an assignment for a specific module
 router.post(
   "/:level/course/:title/assignment",
   authorization,

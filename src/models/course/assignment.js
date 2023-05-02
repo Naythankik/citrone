@@ -27,6 +27,20 @@ const AssignmentSchema = new mongoose.Schema(
       type: Date,
       required: [true, "please provide a submission deadline"],
     },
+    submissions: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "user",
+        },
+        answer: String,
+        grade: Number,
+        mail: {
+          type: Boolean,
+          default: false,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

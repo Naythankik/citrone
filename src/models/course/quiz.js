@@ -2,19 +2,22 @@ const { default: mongoose } = require("mongoose");
 
 const Quiz = new mongoose.Schema(
   {
-    lesson: {
+    module: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "lesson",
-      required: true
+      ref: "module",
+      required: true,
     },
     questions: [
       {
-        body: String,
+        body: {
+          type: String,
+          unique: true,
+        },
         options: Array,
         answer: {
           type: String,
-          enum: ['a', 'b', 'c', 'd'],
-          required: [true, 'please provide the answer']
+          enum: ["a", "b", "c", "d"],
+          required: [true, "please provide the answer"],
         },
       },
     ],

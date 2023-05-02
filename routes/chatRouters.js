@@ -13,4 +13,3 @@ router.get("/",authentication, getAllChatsOfAUser);
 
 
 module.exports = router;
- 

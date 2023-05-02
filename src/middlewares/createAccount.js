@@ -12,16 +12,16 @@ const generateSignUpMail = async (req, res, next) => {
 
     /** my gmail information */
 
+    // const config = {
+    //   service: "gmail",
+    //   auth: {
+    //     user: process.env.EMAIL,
+    //     pass: process.env.EMAIL_PASS,
+    //   },
+    // };
+
     //The config object is missing a secure and port field,
     //There by stopping the email from sending
-
-    const config = {
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASS,
-      },
-    };
 
     const maxAge = "10m";
     const token = jwt.sign(payload, JWT_SECRET, {
@@ -33,38 +33,47 @@ const generateSignUpMail = async (req, res, next) => {
       $set: { registrationToken: token },
     });
 
-    let transporter = nodemailer.createTransport(config);
+    let transporter = nodemailer.createTransport({
+      host: process.env.MAIL_HOST,
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: process.env.MAIL_USERNAME, // generated ethereal user
+        pass: process.env.MAIL_PASSWORD, // generated ethereal password
+      },
+    });
 
     let MailGenerator = new Mailgen({
       theme: "default",
       product: {
         name: "Stutern",
-        link: `http://www.stutern.com`,
+        link: `${process.env.HOSTED_URL}`,
       },
     });
 
     let response = {
       body: {
         name: payload.username,
-        intro: "Welcome Stutern Citrone Platform",
+        intro: "Welcome to Stutern Citrone Platform",
         action: {
           instructions: "Please click the button below to verify your account",
           button: {
             color: "green",
             text: "Verify email address",
-            link: `http://localhost:8070/api/citrone/email/verify/${token}`,
+            link: `${process.env.APP_URL}/api/citrone/email/verify/${token}`,
           },
         },
-        outro: "happy learning. we wish you the very best",
+        outro: "Happy learning. we wish you the very best",
       },
     };
 
     let mail = MailGenerator.generate(response);
 
     const message = {
-      from: "faruqhameed1@gmail.com", //save a sender on the .env and fetch
+      // from: process.env.SENDER_EMAIL, //save a sender on the .env and fetch
+      from: "Citrone citrone@gmail.com.co.ng", //save a sender on the .env and fetch
       to: user.email,
-      subject: "citrone email verification one",
+      subject: "CITRONE EMAIL VERIFICATION",
       html: mail,
     };
 
@@ -92,15 +101,17 @@ const verifySignUpMail = async (req, res) => {
         .send({ message: "email verification failed, sign up again" });
     }
 
-    await User.findByIdAndUpdate(verifyToken.userId, {
-      status: "approved",
-      registrationToken: undefined,
-    });
+    await User.findOneAndUpdate(
+      { registrationToken: token },
+      {
+        registrationToken: "",
+        status: "approved",
+      }
+    );
     //update the registrationToken field to undefined
 
-    res
-      .status(StatusCodes.OK)
-      .send({ message: "account creation successfully kindly go login" });
+    res.redirect(process.env.HOSTED_URL);
+    return;
   } catch (err) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
