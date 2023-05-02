@@ -21,7 +21,7 @@ passport.use(
       const email = profile.emails[0].value;
       const firstName = profile.name.givenName;
       const lastName = profile.name.familyName;
-      const profilePhoto = profile.photos[0].value;
+    //   const profilePhoto = profile.photos[0].value;
       const source = "google";
 
       /**we create the user if the email is already in the database*/
@@ -35,7 +35,7 @@ passport.use(
           email,
           firstName,
           lastName,
-          profilePhoto,
+        //   profilePhoto,
         });
         return done(null, newUser);
       }
