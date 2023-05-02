@@ -22,13 +22,13 @@ const userSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: Number,
-      required: [true, "phone number is required"], //not required if the signing source is not form data
+      // required: [true, "phone number is required"], //not required if the signing source is not form data
       unique: true,
       min: 10,
     },
     password: {
       type: String,
-      required: [true, "password is required"], //not required if the signing source is not form data
+      // required: [true, "password is required"], //not required if the signing source is not form data
       min: 6,
     },
     username: {
