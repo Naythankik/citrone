@@ -48,7 +48,6 @@ passport.use(
         });
       }
 
-      currentUser.lastVisited = new Date(); //if not i.e if he signed up with google, we just updated the last visited date
       return done(null, currentUser);
     }
   ) 
