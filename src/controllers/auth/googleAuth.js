@@ -16,7 +16,6 @@ passport.use(
     },
     /**the profile will contain the user information gotten from the google */
     async (accessToken, refreshToken, profile, done) => {
-      console.log({profile})
       const id = profile.id;
       const email = profile.emails[0].value;
       const firstName = profile.name.givenName;
@@ -52,7 +51,6 @@ passport.use(
     }
   ) 
 ); 
-
 
 
 // Define Routes

@@ -51,11 +51,11 @@ const userSchema = new mongoose.Schema(
       enum: ["approved", "pending"],
       default: "pending",
     },
-    source: {
-      type: String,
-      enum: ["google", "facebook", "form"],
-      default: ["form"]
-    },
+    // source: {
+    //   type: String,
+    //   enum: ["google", "facebook", "form"], //needed to allow third party auth for all users
+    //   default: ["form"]
+    // },
     lesson: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "lesson",
