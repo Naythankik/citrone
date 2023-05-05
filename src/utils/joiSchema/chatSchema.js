@@ -4,8 +4,8 @@ function chatSchema(data) {
   const schema = Joi.object({
     receiver: Joi.string().required(),
     text: Joi.string().min(1).max(400).required(),
-  }); 
+  });
   return schema.validate(data);
 }
 
-module.exports =  chatSchema ;
+module.exports = chatSchema;

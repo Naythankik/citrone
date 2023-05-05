@@ -17,14 +17,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "email is required"],
       unique: true, // `email` must be unique
-      match: /.+\@.+\..+/,
+      // match: /.+\@.+\..+/,
       unique: true,
     },
     phoneNumber: {
-      type: Number,
-      // required: [true, "phone number is required"], //not required if the signing source is not form data
+
+      type: String,
+      required: [true, "phone number is required"],
       unique: true,
-      min: 10,
     },
     password: {
       type: String,
@@ -60,6 +60,12 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "lesson",
     },
+    assignment: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "assignment",
+      },
+    ],
     passwordResetToken: String,
     forgetPasswordExpires: Date,
     registrationToken: String,

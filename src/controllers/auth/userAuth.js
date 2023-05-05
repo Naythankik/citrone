@@ -10,9 +10,13 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES;
 const { signUpSchema, loginSchema } = require("../../utils/joiSchema");
 const { doesUserExist, generateUsername } = require("../../utils");
 
+//the environment
+const environment = process.env.NODE_ENV;
+
 /**user login controller */
 const userLogin = async (req, res) => {
-  // Check if a user is active at the moment on the device
+
+// Check if a user is active at the moment on the device  
   /**Validate the data in the req.body */
   const validation = loginSchema(req.body);
 
@@ -26,7 +30,12 @@ const userLogin = async (req, res) => {
   try {
     /**find a user with the provided email and check if the email and password matched */
     const { email, password } = value;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select([
+      "-__v",
+      "-createdAt",
+      "-updatedAt",
+    ]);
+
     if (!user) {
       return res
         .status(StatusCodes.NOT_FOUND)
@@ -35,9 +44,10 @@ const userLogin = async (req, res) => {
 
     const doesPasswordMatch = await user.comparePassword(password);
     if (!doesPasswordMatch) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .send("wrong password provided try again with another password");
+      return res.status(StatusCodes.UNAUTHORIZED).send({
+        succes: false,
+        error: "wrong password provided try again with another password",
+      });
     }
 
     //check if the user status is pending
@@ -49,6 +59,7 @@ const userLogin = async (req, res) => {
     const existingToken = req.cookies.token;
     if (existingToken) {
       const decodedToken = jwt.verify(existingToken, jwtSecret);
+
       /**if the new user is different from the currently login user */
       if (decodedToken.userId !== user._id)
         res.clearCookie("token", {
@@ -65,59 +76,72 @@ const userLogin = async (req, res) => {
     /**Attaching payload to cookie * and allow it to clear automatically after expiration*/
     const payload = generatePayload(user);
     const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
+
     res.cookie("token", token, {
       httpOnly: true,
       expires: new Date(Date.now() + (30 * 60 * 1000)) // 30 minutes from now,
+
     });
 
     user.isActive = true; //the user is active (i.e online until he logout)
 
     await user.save();
-    res.status(StatusCodes.OK).json({ data: user });
+
+    // restrict the fields sent to the user
+    user.password = user.status = user.registrationToken = undefined;
+
+    res.status(StatusCodes.OK).send({ user });
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err.message);
   }
+  return;
 };
 
 /**user logout controller */
 const userLogout = async (req, res) => {
   const { token } = req.cookies;
 
-  // fetch the user id from the token
-  const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+  try {
+    // fetch the user id from the token
+    const { userId } = jwt.verify(token, process.env.JWT_SECRET);
 
-  // update the user isActive status to false
-  await User.findByIdAndUpdate(userId, {
-    $set: {
-      isActive: false,
-    },
-  });
+    // update the user isActive status to false
+    await User.findByIdAndUpdate(userId, {
+      $set: {
+        isActive: false,
+      },
+    });
 
-  //clear the authenticated user token after updating the user
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: true,
-  });
+    //clear the authenticated user token after updating the user
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+    });
 
-  res.status(StatusCodes.OK).json({ message: "user logged out" });
+    res.status(StatusCodes.OK).json({ message: "user logged out" });
+  } catch (error) {
+    res.send({ success: false, error: error.message });
+  }
 };
 
 const createAccount = async (req, res, next) => {
   try {
     //validating the user's inputed data with joi schema
-    const validation = signUpSchema(req.body);
-    if (validation.error) {
-      res
-        .status(StatusCodes.UNPROCESSABLE_ENTITY)
-        .send(validation.error.details[0].message);
+    const { error, value } = signUpSchema(req.body);
+    if (error) {
+      res.status(StatusCodes.UNPROCESSABLE_ENTITY).send({
+        success: false,
+        error: error.details[0].message,
+      });
       return;
     }
     const userAlreadyExist = await doesUserExist(
       User,
-      validation.value,
+      value,
       "email",
       "phoneNumber"
     );
+
     if (userAlreadyExist) {
       return res
         .status(userAlreadyExist.status)
@@ -125,7 +149,7 @@ const createAccount = async (req, res, next) => {
     }
 
     //if the validation and checking passed we create the new  user
-    const newUser = new User(validation.value);
+    const newUser = new User(value);
     newUser.username = await generateUsername(User, newUser.firstName); //generating a username for the new user
     await newUser.save();
     const payload = generatePayload(newUser);
@@ -133,7 +157,11 @@ const createAccount = async (req, res, next) => {
     req.body.payload = payload;
     next();
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err.message);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      success: false,
+      message: err.message,
+    });
+    return;
   }
 };
 
@@ -145,7 +173,7 @@ const forgetPassword = async (req, res) => {
     const user = await User.findOne({ email });
 
     //   //if user is not found , return a response of 404
-    if (!user) throw new Error("Email is not found");
+    if (!user) res.status(404).send({ error: "Email is not found" });
 
     // if found, create a token
     const token = crypto.randomBytes(32).toString("hex");
@@ -184,8 +212,9 @@ const forgetPassword = async (req, res) => {
       .send({ message: "Mail has been sent to the email address provided" });
     return;
   } catch (error) {
-    throw new Error(error);
+    res.send({ error: error.message });
   }
+  return;
 };
 
 const resetPassword = async (req, res) => {
@@ -207,13 +236,17 @@ const resetPassword = async (req, res) => {
 
     // check if password is undefined
     if (!password) {
-      res.status(400).send("Password must be provided");
+      res
+        .status(400)
+        .send({ success: false, error: "Password must be provided" });
       return;
     }
 
     //check if the password matches with confirm password
     if (password !== confirmPassword) {
-      res.status(403).send("Password does not match");
+      res
+        .status(403)
+        .send({ success: false, error: "Password does not match" });
       return;
     }
 

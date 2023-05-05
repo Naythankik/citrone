@@ -4,11 +4,16 @@ const { StatusCodes } = require("http-status-codes");
 
 const { chatSchema } = require("../utils/joiSchema");
 
+//changed some stuff in the function, the request body should be receiving just the content of the message
+//and we have to append the receiver "name" or "username" to the route, so we can fetch the receiver id
+//after the success, the user should be redirected back to the in-chat
+
 const createChat = async (req, res, next) => {
   /**validate the data sent from the client 
    * the validated data include text and the receiverId/ partnerId
    * two users will be returned back to the sender */
   const { userId } = req.payload;
+
   try {
     const validation = chatSchema(req.body);
     const { value, error } = validation;
@@ -21,14 +26,16 @@ const createChat = async (req, res, next) => {
     }
     const { receiver } = value;
     value.sender = userId;
+
     // add the new message to the database
-    await Chat.create({ ...value });
+    await Chat.create(value);
+
     /**find all the chats between the two users where
      * the sender is either the receiver or sender */
     const chatBetweenTheUsers = await Chat.find({
       $or: [
-        { sender: userId, receiver: receiver },
-        { sender: receiver, receiver: userId },
+        { sender: sender, receiver: receiver },
+        { sender: receiver, receiver: sender },
       ],
     }).sort({ createdAt: -1 }); // sort by created time
 
@@ -41,13 +48,15 @@ const createChat = async (req, res, next) => {
 
 // //This route will be executed whenever a user hit the chat page
 /**THIS IS THE REAL CONTROLLER */
+
 const getAllChatsOfAUser = async (req, res, next) => {
   const { userId } = req.payload; 
 
   /**Get all chats where the user is a participant sorted by date*/
   const allChats = await Chat.find({
     $or: [{ sender: userId }, { receiver: userId }],
-  }).sort({ createdAt: -1 });
+
+}).sort({ createdAt: -1 });
   const sortedChats = []; //the finally sorted chats array will be returned to the caller
 // console.log({allChats} , { userId })
   /**loop through the chats and separate chat he has with different users */
@@ -101,14 +110,17 @@ const getUserChatsWithAnotherUser = async (req, res, next) => {
     }).sort({ createdAt: -1 });
     /**update all the read values of the chats where the user is the recipient to true */
 
+
     const chatIds = chatsBetweenTheUsers
       .filter(
         (chatObject) => chatObject.receiver.toString() === userId.toString() //return chat object where user is the receiver
       )
       .map((chatObject) => chatObject._id.toString()); //return only the string chat id of the chats
     if (chatIds.length > 0) {
-      /**update all the chats sent to the users which are unread to read */
+
+/**update all the chats sent to the users which are unread to read */
       await Chat.updateMany(
+
         { _id: { $in: chatIds } },
         { $set: { read: true } }
       );
