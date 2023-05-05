@@ -21,13 +21,14 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     phoneNumber: {
+
       type: String,
       required: [true, "phone number is required"],
       unique: true,
     },
     password: {
       type: String,
-      required: [true, "password is required"],
+      // required: [true, "password is required"], //not required if the signing source is not form data
       min: 6,
     },
     username: {
@@ -50,6 +51,11 @@ const userSchema = new mongoose.Schema(
       enum: ["approved", "pending"],
       default: "pending",
     },
+   // source: {
+    //   type: String,
+    //   enum: ["google", "facebook", "form"], //needed to allow third party auth for all users
+    //   default: ["form"]
+    // },
     lesson: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "lesson",
