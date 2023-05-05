@@ -15,8 +15,7 @@ const environment = process.env.NODE_ENV;
 
 /**user login controller */
 const userLogin = async (req, res) => {
-
-// Check if a user is active at the moment on the device  
+  // Check if a user is active at the moment on the device
   /**Validate the data in the req.body */
   const validation = loginSchema(req.body);
 
@@ -77,11 +76,11 @@ const userLogin = async (req, res) => {
     const payload = generatePayload(user);
     const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      expires: new Date(Date.now() + (30 * 60 * 1000)) // 30 minutes from now,
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   expires: new Date(Date.now() + (30 * 60 * 1000)) // 30 minutes from now,
 
-    });
+    // });
 
     user.isActive = true; //the user is active (i.e online until he logout)
 
@@ -90,7 +89,7 @@ const userLogin = async (req, res) => {
     // restrict the fields sent to the user
     user.password = user.status = user.registrationToken = undefined;
 
-    res.status(StatusCodes.OK).send({ user });
+    res.status(StatusCodes.OK).send({ user, token });
   } catch (err) {
     res.status(StatusCodes.BAD_REQUEST).send(err.message);
   }
