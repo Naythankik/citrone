@@ -41,6 +41,7 @@ const userLogin = async (req, res) => {
         .send("user with email not found");
     }
 
+    // check if the password matches with the one from the user
     const doesPasswordMatch = await user.comparePassword(password);
     if (!doesPasswordMatch) {
       return res.status(StatusCodes.UNAUTHORIZED).send({
@@ -54,33 +55,27 @@ const userLogin = async (req, res) => {
       res.status(401).send({ message: "user account has not been verified" });
       return;
     }
+
     /*check if a user is signed in on the device(the browser) at the moment and logout the user */
-    const existingToken = req.cookies.token;
+    const existingToken = req.headers.authorization.substring(7);
+
     if (existingToken) {
       const decodedToken = jwt.verify(existingToken, jwtSecret);
 
       /**if the new user is different from the currently login user */
-      if (decodedToken.userId !== user._id)
-        res.clearCookie("token", {
-          httpOnly: true,
-          secure: true,
+      if (decodedToken.userId !== user._id) {
+        // update the current login user isActive status to false
+        const usersa = await User.findByIdAndUpdate(decodedToken.userId, {
+          $set: {
+            isActive: false,
+          },
         });
-      // update the current login user isActive status to false
-      await User.findByIdAndUpdate(decodedToken.userId, {
-        $set: {
-          isActive: false,
-        },
-      });
+      }
     }
+
     /**Attaching payload to cookie * and allow it to clear automatically after expiration*/
     const payload = generatePayload(user);
     const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
-
-    // res.cookie("token", token, {
-    //   httpOnly: true,
-    //   expires: new Date(Date.now() + (30 * 60 * 1000)) // 30 minutes from now,
-
-    // });
 
     user.isActive = true; //the user is active (i.e online until he logout)
 
