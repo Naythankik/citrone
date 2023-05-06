@@ -9,6 +9,7 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES;
 
 const { signUpSchema, loginSchema } = require("../../utils/joiSchema");
 const { doesUserExist, generateUsername } = require("../../utils");
+const { log } = require("console");
 
 //the environment
 const environment = process.env.NODE_ENV;
@@ -41,6 +42,7 @@ const userLogin = async (req, res) => {
         .send("user with email not found");
     }
 
+    // check if the password matches with the one from the user
     const doesPasswordMatch = await user.comparePassword(password);
     if (!doesPasswordMatch) {
       return res.status(StatusCodes.UNAUTHORIZED).send({
@@ -54,33 +56,29 @@ const userLogin = async (req, res) => {
       res.status(401).send({ message: "user account has not been verified" });
       return;
     }
-    /*check if a user is signed in on the device(the browser) at the moment and logout the user */
-    const existingToken = req.cookies.token;
-    if (existingToken) {
-      const decodedToken = jwt.verify(existingToken, jwtSecret);
 
-      /**if the new user is different from the currently login user */
-      if (decodedToken.userId !== user._id)
-        res.clearCookie("token", {
-          httpOnly: true,
-          secure: true,
-        });
-      // update the current login user isActive status to false
-      await User.findByIdAndUpdate(decodedToken.userId, {
-        $set: {
-          isActive: false,
-        },
-      });
+    /*check if a user is signed in on the device(the browser) at the moment and logout the user */
+    if (req.headers.authorization) {
+      const existingToken = req.headers.authorization.substring(7);
+
+      if (existingToken) {
+        const decodedToken = jwt.verify(existingToken, jwtSecret);
+
+        /**if the new user is different from the currently login user */
+        if (decodedToken.userId !== user._id) {
+          // update the current login user isActive status to false
+          const usersa = await User.findByIdAndUpdate(decodedToken.userId, {
+            $set: {
+              isActive: false,
+            },
+          });
+        }
+      }
     }
+
     /**Attaching payload to cookie * and allow it to clear automatically after expiration*/
     const payload = generatePayload(user);
     const token = jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES });
-
-    // res.cookie("token", token, {
-    //   httpOnly: true,
-    //   expires: new Date(Date.now() + (30 * 60 * 1000)) // 30 minutes from now,
-
-    // });
 
     user.isActive = true; //the user is active (i.e online until he logout)
 
@@ -98,11 +96,16 @@ const userLogin = async (req, res) => {
 
 /**user logout controller */
 const userLogout = async (req, res) => {
-  const { token } = req.cookies;
+  const {
+    headers: { authorization },
+  } = req;
 
   try {
     // fetch the user id from the token
-    const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+    const { userId } = jwt.verify(
+      authorization.split(" ")[1],
+      process.env.JWT_SECRET
+    );
 
     // update the user isActive status to false
     await User.findByIdAndUpdate(userId, {
@@ -111,11 +114,7 @@ const userLogout = async (req, res) => {
       },
     });
 
-    //clear the authenticated user token after updating the user
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-    });
+    // authorization.split(" ")[1] = "";
 
     res.status(StatusCodes.OK).json({ message: "user logged out" });
   } catch (error) {
