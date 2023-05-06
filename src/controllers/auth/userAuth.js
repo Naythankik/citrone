@@ -9,6 +9,7 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES;
 
 const { signUpSchema, loginSchema } = require("../../utils/joiSchema");
 const { doesUserExist, generateUsername } = require("../../utils");
+const { log } = require("console");
 
 //the environment
 const environment = process.env.NODE_ENV;
@@ -57,19 +58,21 @@ const userLogin = async (req, res) => {
     }
 
     /*check if a user is signed in on the device(the browser) at the moment and logout the user */
-    const existingToken = req.headers.authorization.substring(7);
+    if (req.headers.authorization) {
+      const existingToken = req.headers.authorization.substring(7);
 
-    if (existingToken) {
-      const decodedToken = jwt.verify(existingToken, jwtSecret);
+      if (existingToken) {
+        const decodedToken = jwt.verify(existingToken, jwtSecret);
 
-      /**if the new user is different from the currently login user */
-      if (decodedToken.userId !== user._id) {
-        // update the current login user isActive status to false
-        const usersa = await User.findByIdAndUpdate(decodedToken.userId, {
-          $set: {
-            isActive: false,
-          },
-        });
+        /**if the new user is different from the currently login user */
+        if (decodedToken.userId !== user._id) {
+          // update the current login user isActive status to false
+          const usersa = await User.findByIdAndUpdate(decodedToken.userId, {
+            $set: {
+              isActive: false,
+            },
+          });
+        }
       }
     }
 
@@ -93,11 +96,16 @@ const userLogin = async (req, res) => {
 
 /**user logout controller */
 const userLogout = async (req, res) => {
-  const { token } = req.cookies;
+  const {
+    headers: { authorization },
+  } = req;
 
   try {
     // fetch the user id from the token
-    const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+    const { userId } = jwt.verify(
+      authorization.split(" ")[1],
+      process.env.JWT_SECRET
+    );
 
     // update the user isActive status to false
     await User.findByIdAndUpdate(userId, {
@@ -106,11 +114,7 @@ const userLogout = async (req, res) => {
       },
     });
 
-    //clear the authenticated user token after updating the user
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-    });
+    // authorization.split(" ")[1] = "";
 
     res.status(StatusCodes.OK).json({ message: "user logged out" });
   } catch (error) {

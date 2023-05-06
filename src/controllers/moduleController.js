@@ -19,6 +19,7 @@ const postCourseLevel = async (req, res) => {
   const courseInput = Joi.object({
     level: Joi.string().lowercase().required(),
   });
+
   const { error, value } = courseInput.validate(req.body);
 
   //check if error is true and send the response back to the user
@@ -31,7 +32,7 @@ const postCourseLevel = async (req, res) => {
     await Course.create(value);
     res.status(200).send({ message: "course has been created" });
   } catch (error) {
-    throw new Error(error);
+    res.status(400).send({ error: error.message });
   }
   return;
 };
@@ -75,7 +76,9 @@ const createAModule = async (req, res) => {
     module: Joi.string().required(),
     title: Joi.string().lowercase().required(),
     description: Joi.string().lowercase().required(),
-    objectives: Joi.string().lowercase().required(),
+
+    //accepts an array so as to destructure the entries into a list
+    objectives: Joi.array().items(Joi.string().required()).required(),
   });
 
   const { error, value } = moduleValidation.validate(req.body);
@@ -101,8 +104,11 @@ const createAModule = async (req, res) => {
 
     res.status(200).send({ message: "module has been created successfully" });
   } catch (error) {
+    res.status(400).send({ error: error.message });
+
     throw new Error(error);
   }
+  return;
 };
 
 //when the user wants to see all lessons for a module
@@ -143,6 +149,7 @@ const createLesson = async (req, res) => {
   //if error is true
   if (error) {
     res.status(400).send({ message: error.details[0].message });
+    return;
   }
 
   value.module = id;
@@ -157,11 +164,11 @@ const createLesson = async (req, res) => {
       },
     });
 
-    res.status(200).send({ message: lesson });
-    return;
+    res.status(200).send({ success: true, message: lesson });
   } catch (error) {
-    throw new Error(error);
+    res.status(400).send({ error: error.message });
   }
+  return;
 };
 
 module.exports = {
