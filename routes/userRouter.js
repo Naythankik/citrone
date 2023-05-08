@@ -74,7 +74,7 @@ router
 router
   .route("/:level/course")
   .get(getALevelModules)
-  .post(authorization, createAModule);
+  .post(authorization, uploader.single("image"), createAModule);
 
 //routes for getting a module and creating a lesson for the module
 router

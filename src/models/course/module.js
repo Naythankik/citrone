@@ -24,6 +24,7 @@ const Module = new mongoose.Schema(
       type: Array,
       required: [true, "please provide the module objectives"],
     },
+    imageUrl: String,
     lesson: [
       {
         type: mongoose.Schema.Types.ObjectId,
