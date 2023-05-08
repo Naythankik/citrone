@@ -2,12 +2,12 @@ const express = require("express");
 require("dotenv").config();
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
+
 const connection = require("./config/dbConnection");
 const userRouter = require("./routes/userRouter");
 const { authRouter } = require("./routes/index");
 const chatRouter = require("./routes/chatRouters");
-
-const cors = require("cors");
 
 const { resetPassword } = require("./src/controllers/userControllers");
 const { verifySignUpMail } = require("./src/middlewares/createAccount");
@@ -33,7 +33,6 @@ app.use(
 );
 app.use(express.json());
 app.use(logger("dev")); //logger to log every request and response summary
-
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
