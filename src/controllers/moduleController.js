@@ -102,6 +102,11 @@ const createAModule = async (req, res) => {
   value.course = id;
 
   try {
+    //check the incoming file by the admin,
+    //made use of slug title so the file upload will be unique
+    const result = await uploadImage(req.file.path, value.slug_title);
+    value.imageUrl = result.url;
+
     const module = await Module.create(value);
 
     // if the module is created, add the id to the course or level module
@@ -113,8 +118,6 @@ const createAModule = async (req, res) => {
     res.status(200).send({ message: "module has been created successfully" });
   } catch (error) {
     res.status(400).send({ error: error.message });
-
-    throw new Error(error);
   }
   return;
 };
