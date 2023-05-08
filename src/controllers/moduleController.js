@@ -2,6 +2,8 @@ const { Module, Lesson, Course, Assignment } = require("../models");
 const slugify = require("slugify");
 const Joi = require("joi");
 
+const { uploadImage } = require("../utils/uploadImage");
+
 // when a user wants to get all the levels of the DBs
 const getCoursesLevel = async (req, res) => {
   try {
@@ -28,12 +30,18 @@ const postCourseLevel = async (req, res) => {
     return;
   }
 
+  // upload the file sent by the user
+  // then append the uploaded url to the image url field
   try {
+    const result = await uploadImage(req.file.path, value.level);
+    value.imageUrl = result.url;
+
     await Course.create(value);
     res.status(200).send({ message: "course has been created" });
   } catch (error) {
     res.status(400).send({ error: error.message });
   }
+
   return;
 };
 

@@ -12,6 +12,7 @@ const Course = new mongoose.Schema(
         ref: "module",
       },
     ],
+    imageUrl: String,
   },
   { timestamps: true }
 );
