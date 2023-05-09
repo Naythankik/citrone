@@ -23,14 +23,7 @@ connection(); //server connection function
 // app.use(cors({ origin: "*", credentials: true, allowedHeaders: true }));
 
 /**allow cross-origin-request-sharing(CORS)*/
-app.use(
-  cors({
-    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
-    origin: "*",
-    //     credentials: true,
-    allowedHeaders: true,
-  })
-);
+app.use(cors());
 app.use(express.json());
 app.use(logger("dev")); //logger to log every request and response summary
 app.use(cookieParser());
