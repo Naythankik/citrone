@@ -25,7 +25,7 @@ connection(); //server connection function
 /**allow cross-origin-request-sharing(CORS)*/
 app.use(
   cors({
-    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH", "OPTIONS"],
+    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
     origin: "*",
     //     credentials: true,
     allowedHeaders: true,
