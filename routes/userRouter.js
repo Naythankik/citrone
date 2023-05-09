@@ -39,7 +39,7 @@ const router = express.Router();
 
 router.route("/").get(getUserAccount).put(updateUserProfile);
 
-// routes for assigment
+// routes to get all assigment
 router.route("/assignment").get(getAllAssignments);
 
 //update the asssignment by the id

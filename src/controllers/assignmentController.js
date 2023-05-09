@@ -7,10 +7,13 @@ const { mail } = require("../utils");
 const getAllAssignments = async (req, res) => {
   try {
     // fetch all assigments from the collection
-    const assignment = await Assignment.find().populate({
-      path: "module",
-      // populate: { path: "lesson" },
-    });
+    const assignment = await Assignment.find()
+      .populate({
+        path: "module",
+        select: "-_id",
+        // populate: { path: "lesson" },
+      })
+      .select(["-_id"]);
 
     res.status(200).send({ assignment });
   } catch (error) {
