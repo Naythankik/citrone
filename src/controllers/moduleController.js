@@ -7,7 +7,7 @@ const { uploadImage } = require("../utils/uploadImage");
 // when a user wants to get all the levels of the DBs
 const getCoursesLevel = async (req, res) => {
   try {
-    const level = await Course.find();
+    const level = await Course.find().select(["-module", "-_id"]);
     res.status(200).send({ message: level });
     return;
   } catch (error) {
