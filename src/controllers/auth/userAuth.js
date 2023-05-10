@@ -53,14 +53,14 @@ const userLogin = async (req, res, next) => {
 
     //check if the user status is pending
     if (user.status !== "approved") {
-      await User.findByIdAndDelete(user.id); //delete user account and allowed to sign up again
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .send({
-          message: "You failed to verify your email. Please sign up again!",
-        });
+      // await User.findByIdAndDelete(user.id); //delete user account and allowed to sign up again
+      // return res
+      //   .status(StatusCodes.BAD_REQUEST)
+      //   .send({
+      //     message: "You failed to verify your email. Please sign up again!",
+      //   });
       // return res.status(401).send({ message: "user account has not been verified" });
-      // return next(); //we resend a verification token again if the user status is pending 
+      return next(); //we resend a verification token again if the user status is pending 
     }
 
     /*check if a user is signed in on the device(the browser) at the moment and logout the user */
