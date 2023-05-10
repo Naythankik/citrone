@@ -53,7 +53,7 @@ const userLogin = async (req, res, next) => {
 
     //check if the user status is pending
     if (user.status !== "approved") {
-      await user.findByIdAndDelete(user.id);
+      await User.findByIdAndDelete(user.id); //delete user account and allowed to sign up again
       return res
         .status(StatusCodes.BAD_REQUEST)
         .send({
