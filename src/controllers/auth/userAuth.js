@@ -15,7 +15,7 @@ const { log } = require("console");
 const environment = process.env.NODE_ENV;
 
 /**user login controller */
-const userLogin = async (req, res) => {
+const userLogin = async (req, res, next) => {
   // Check if a user is active at the moment on the device
   /**Validate the data in the req.body */
   const validation = loginSchema(req.body);
@@ -53,8 +53,8 @@ const userLogin = async (req, res) => {
 
     //check if the user status is pending
     if (user.status !== "approved") {
-      res.status(401).send({ message: "user account has not been verified" });
-      return;
+      // res.status(401).send({ message: "user account has not been verified" });
+      return next(); //we resend a verification token again if the user status is pending 
     }
 
     /*check if a user is signed in on the device(the browser) at the moment and logout the user */
