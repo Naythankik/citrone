@@ -60,7 +60,7 @@ const userLogin = async (req, res, next) => {
       //     message: "You failed to verify your email. Please sign up again!",
       //   });
       // return res.status(401).send({ message: "user account has not been verified" });
-      const payload = generatePayload(newUser);
+      const payload = generatePayload(user);
 
       req.body.payload = payload;
       return next(); //we resend a verification token again if the user status is pending
