@@ -1,4 +1,6 @@
 const express = require("express");
+const uploader = require("../src/utils/multer");
+
 const {
   getAllAssignments,
   createAssignment,
@@ -37,7 +39,7 @@ const router = express.Router();
 
 router.route("/").get(getUserAccount).put(updateUserProfile);
 
-// routes for assigment
+// routes to get all assigment
 router.route("/assignment").get(getAllAssignments);
 
 //update the asssignment by the id
@@ -66,13 +68,13 @@ router.post(
 router
   .route("/courses")
   .get(getCoursesLevel)
-  .post(authorization, postCourseLevel);
+  .post(authorization, uploader.single("image"), postCourseLevel);
 
 //routes for getting module of a course level and creating a module for a course level
 router
   .route("/:level/course")
   .get(getALevelModules)
-  .post(authorization, createAModule);
+  .post(authorization, uploader.single("image"), createAModule);
 
 //routes for getting a module and creating a lesson for the module
 router

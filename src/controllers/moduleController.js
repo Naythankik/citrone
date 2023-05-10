@@ -2,10 +2,12 @@ const { Module, Lesson, Course, Assignment } = require("../models");
 const slugify = require("slugify");
 const Joi = require("joi");
 
+const { uploadImage } = require("../utils/uploadImage");
+
 // when a user wants to get all the levels of the DBs
 const getCoursesLevel = async (req, res) => {
   try {
-    const level = await Course.find();
+    const level = await Course.find().select(["-module", "-_id"]);
     res.status(200).send({ message: level });
     return;
   } catch (error) {
@@ -19,6 +21,7 @@ const postCourseLevel = async (req, res) => {
   const courseInput = Joi.object({
     level: Joi.string().lowercase().required(),
   });
+
   const { error, value } = courseInput.validate(req.body);
 
   //check if error is true and send the response back to the user
@@ -27,12 +30,18 @@ const postCourseLevel = async (req, res) => {
     return;
   }
 
+  // upload the file sent by the user
+  // then append the uploaded url to the image url field
   try {
+    const result = await uploadImage(req.file.path, value.level);
+    value.imageUrl = result.url;
+
     await Course.create(value);
     res.status(200).send({ message: "course has been created" });
   } catch (error) {
-    throw new Error(error);
+    res.status(400).send({ error: error.message });
   }
+
   return;
 };
 
@@ -75,7 +84,9 @@ const createAModule = async (req, res) => {
     module: Joi.string().required(),
     title: Joi.string().lowercase().required(),
     description: Joi.string().lowercase().required(),
-    objectives: Joi.string().lowercase().required(),
+
+    //accepts an array so as to destructure the entries into a list
+    objectives: Joi.array().items(Joi.string().required()).required(),
   });
 
   const { error, value } = moduleValidation.validate(req.body);
@@ -91,6 +102,11 @@ const createAModule = async (req, res) => {
   value.course = id;
 
   try {
+    //check the incoming file by the admin,
+    //made use of slug title so the file upload will be unique
+    const result = await uploadImage(req.file.path, value.slug_title);
+    value.imageUrl = result.url;
+
     const module = await Module.create(value);
 
     // if the module is created, add the id to the course or level module
@@ -101,8 +117,9 @@ const createAModule = async (req, res) => {
 
     res.status(200).send({ message: "module has been created successfully" });
   } catch (error) {
-    throw new Error(error);
+    res.status(400).send({ error: error.message });
   }
+  return;
 };
 
 //when the user wants to see all lessons for a module
@@ -143,6 +160,7 @@ const createLesson = async (req, res) => {
   //if error is true
   if (error) {
     res.status(400).send({ message: error.details[0].message });
+    return;
   }
 
   value.module = id;
@@ -157,11 +175,11 @@ const createLesson = async (req, res) => {
       },
     });
 
-    res.status(200).send({ message: lesson });
-    return;
+    res.status(200).send({ success: true, message: lesson });
   } catch (error) {
-    throw new Error(error);
+    res.status(400).send({ error: error.message });
   }
+  return;
 };
 
 module.exports = {
