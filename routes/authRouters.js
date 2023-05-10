@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/forget-password", forgetPassword);
 
 // login endpoint
-router.post("/login", userLogin);
+router.post("/login", userLogin,generateSignUpMail);
 
 // logout endpoint
 router.get("/logout", authentication, userLogout);
