@@ -56,12 +56,22 @@ app.use("/api/citrone/user", authentication, userRouter);
 
 //default routes
 app.use(["/", "/api/citrone"], (req, res) => {
-  res.status(404).json({
+  res.status(200).json({
     success: true,
     message: "Welcome to CITRONE",
   });
   return;
 });
+
+//handling unknown routes
+app.use("*", (req, res) => {
+  res.status(404).json({
+    success: true,
+    message: "Invalid endpoint",
+  });
+  return;
+});
+
 
 app.listen(PORT, () => {
   console.log(`App is running on ${PORT}`);
