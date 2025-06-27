@@ -5,8 +5,11 @@
   
 ## CITRONE DOCUMENTATION 
   [https://www.postman.com/naythankik/workspace/citrone](https://www.postman.com/naythankik/workspace/citrone)
+
+## PRODUCTION URL
+  [https://citrone.vercel.app/](https://citrone.co/)
   
-## HOSTING URL
+## DEVELOPMENT API HOSTING URL
   [https://citrone.vercel.app/](https://citrone.vercel.app/)
 
 
